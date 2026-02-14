@@ -1,0 +1,146 @@
+import { useState } from "react";
+import { watchedMovies } from "@/data/mockData";
+import { StarRating } from "@/components/StarRating";
+import { Settings, Film, MessageSquare, Clock, CreditCard } from "lucide-react";
+
+type ProfileTab = "watched" | "reviews" | "pools";
+
+export function UserProfile() {
+  const [tab, setTab] = useState<ProfileTab>("watched");
+
+  return (
+    <div className="pb-24">
+      <header className="sticky top-0 z-40 glass px-4 py-3">
+        <div className="flex items-center justify-between">
+          <h1 className="font-display font-bold text-xl">Profile</h1>
+          <button className="rounded-full p-2 hover:bg-secondary transition-colors">
+            <Settings size={18} className="text-muted-foreground" />
+          </button>
+        </div>
+      </header>
+
+      {/* Profile info */}
+      <div className="flex flex-col items-center pt-6 pb-4">
+        <div className="h-20 w-20 rounded-full gradient-gold flex items-center justify-center text-2xl font-display font-bold text-primary-foreground">
+          AK
+        </div>
+        <h2 className="font-display font-bold text-lg mt-3">Anika Kumar</h2>
+        <p className="text-xs text-muted-foreground">Cinephile since 2019 · 247 films watched</p>
+
+        <div className="flex items-center gap-6 mt-4">
+          <div className="text-center">
+            <p className="font-display font-bold text-lg">247</p>
+            <p className="text-[10px] text-muted-foreground">Watched</p>
+          </div>
+          <div className="h-8 w-px bg-border" />
+          <div className="text-center">
+            <p className="font-display font-bold text-lg">52</p>
+            <p className="text-[10px] text-muted-foreground">Reviews</p>
+          </div>
+          <div className="h-8 w-px bg-border" />
+          <div className="text-center">
+            <p className="font-display font-bold text-lg text-primary">$38</p>
+            <p className="text-[10px] text-muted-foreground">Saved</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex border-b border-border mx-4">
+        {([
+          { key: "watched" as const, label: "Watched", icon: Film },
+          { key: "reviews" as const, label: "Reviews", icon: MessageSquare },
+          { key: "pools" as const, label: "Pools", icon: CreditCard },
+        ]).map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-medium transition-colors ${
+              tab === t.key
+                ? "text-primary border-b-2 border-primary"
+                : "text-muted-foreground"
+            }`}
+          >
+            <t.icon size={14} />
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      {tab === "watched" && (
+        <div className="grid grid-cols-3 gap-2 p-4">
+          {watchedMovies.map((movie) => (
+            <div key={movie.id} className="relative rounded-xl overflow-hidden animate-fade-in">
+              <img
+                src={movie.poster}
+                alt={movie.title}
+                className="w-full aspect-[2/3] object-cover"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-2">
+                <p className="text-[10px] font-medium truncate">{movie.title}</p>
+                <StarRating rating={movie.rating} size={10} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab === "reviews" && (
+        <div className="p-4 space-y-3">
+          {watchedMovies.slice(0, 3).map((movie) => (
+            <div key={movie.id} className="glass rounded-xl p-3 animate-fade-in">
+              <div className="flex items-center gap-2">
+                <img src={movie.poster} alt={movie.title} className="h-10 w-7 rounded object-cover" />
+                <div>
+                  <p className="text-sm font-medium">{movie.title}</p>
+                  <StarRating rating={movie.rating} size={10} />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                A truly memorable experience. Would recommend to anyone looking for quality cinema.
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab === "pools" && (
+        <div className="p-4 space-y-3">
+          <div className="glass rounded-xl p-4 animate-fade-in">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-display font-semibold text-netflix">Netflix</p>
+                <p className="text-xs text-muted-foreground">Premium 4K · Active</p>
+              </div>
+              <p className="font-display font-bold text-foreground">$4.50/mo</p>
+            </div>
+            <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+              <Clock size={12} />
+              <span>Next payment: Mar 1, 2026</span>
+            </div>
+          </div>
+          <div className="glass rounded-xl p-4 animate-fade-in">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-display font-semibold text-disney">Disney+</p>
+                <p className="text-xs text-muted-foreground">Bundle · Active</p>
+              </div>
+              <p className="font-display font-bold text-foreground">$3.25/mo</p>
+            </div>
+            <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+              <Clock size={12} />
+              <span>Next payment: Mar 5, 2026</span>
+            </div>
+          </div>
+          <div className="glass rounded-xl p-3 text-center">
+            <p className="text-xs text-muted-foreground">Total saved this month</p>
+            <p className="font-display font-bold text-2xl text-primary mt-1">$38.50</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
