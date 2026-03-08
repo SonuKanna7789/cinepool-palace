@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useProfile, useWatchedMovies } from "@/hooks/useApi";
+import { useAuth } from "@/contexts/AuthContext";
 import { watchedMovies as mockWatched } from "@/data/mockData";
 import { StarRating } from "@/components/StarRating";
-import { Settings, Film, MessageSquare, Clock, CreditCard } from "lucide-react";
+import { Settings, Film, MessageSquare, Clock, CreditCard, LogOut } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type ProfileTab = "watched" | "reviews" | "pools";
