@@ -33,9 +33,18 @@ export function UserProfile() {
       <header className="sticky top-0 z-40 glass px-4 py-3">
         <div className="flex items-center justify-between">
           <h1 className="font-display font-bold text-xl">Profile</h1>
-          <button className="rounded-full p-2 hover:bg-secondary transition-colors">
-            <Settings size={18} className="text-muted-foreground" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button className="rounded-full p-2 hover:bg-secondary transition-colors">
+              <Settings size={18} className="text-muted-foreground" />
+            </button>
+            <button
+              onClick={logout}
+              className="rounded-full p-2 hover:bg-destructive/10 transition-colors"
+              title="Sign out"
+            >
+              <LogOut size={18} className="text-muted-foreground hover:text-destructive" />
+            </button>
+          </div>
         </div>
       </header>
 
