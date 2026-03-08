@@ -8,17 +8,25 @@ import type { Pool } from "@/data/mockData";
 
 const platforms: (OttPlatform | "all")[] = ["all", "netflix", "disney", "hbo", "prime"];
 
+function formatExpiry(expiresAt: string): string {
+  const diff = new Date(expiresAt).getTime() - Date.now();
+  if (diff <= 0) return "Expired";
+  const days = Math.floor(diff / 86400000);
+  if (days > 30) return `${Math.floor(days / 30)}mo left`;
+  return `${days}d left`;
+}
+
 function mapApiPool(item: any): Pool {
   return {
-    id: item.id,
-    platform: item.platform?.toLowerCase() ?? "netflix",
-    creator: item.creator ?? "Unknown",
+    id: String(item.id),
+    platform: (item.platform?.toLowerCase() ?? "netflix") as OttPlatform,
+    creator: item.creator?.name ?? item.creator ?? "Unknown",
     plan: item.plan ?? "",
-    pricePerSlot: item.pricePerSlot ?? "$0",
+    pricePerSlot: typeof item.pricePerSlot === "number" ? `$${item.pricePerSlot.toFixed(2)}` : (item.pricePerSlot ?? "$0"),
     filledSlots: item.filledSlots ?? 0,
     totalSlots: item.totalSlots ?? 4,
     country: item.country ?? "US",
-    expiresIn: item.expiresIn ?? "—",
+    expiresIn: item.expiresAt ? formatExpiry(item.expiresAt) : (item.expiresIn ?? "—"),
   };
 }
 
