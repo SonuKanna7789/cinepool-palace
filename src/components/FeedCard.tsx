@@ -32,7 +32,7 @@ export function FeedCard({ post }: { post: FeedPost }) {
 
       {/* Review text */}
       <p className="px-4 pt-2 text-sm leading-relaxed text-secondary-foreground">
-        {post.review}
+        {typeof post.review === "string" ? post.review : ""}
       </p>
 
       {/* Boost comment */}
