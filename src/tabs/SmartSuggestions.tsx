@@ -1,10 +1,33 @@
 import { useState } from "react";
-import { suggestions } from "@/data/mockData";
+import { useSuggestions } from "@/hooks/useApi";
+import { suggestions as mockSuggestions } from "@/data/mockData";
 import { SuggestionCard } from "@/components/SuggestionCard";
 import { Sparkles, SlidersHorizontal } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { Suggestion } from "@/data/mockData";
+
+function mapApiSuggestion(item: any): Suggestion {
+  return {
+    id: item.id,
+    movie: {
+      title: item.movie?.title ?? "",
+      year: item.movie?.year ?? 2025,
+      poster: item.movie?.posterUrl ?? item.movie?.poster ?? "",
+      genre: item.movie?.genre ?? "",
+      director: item.movie?.director ?? "",
+      platforms: item.movie?.platforms ?? [],
+    },
+    matchPercent: item.matchPercent ?? 80,
+    reason: item.reason ?? "",
+  };
+}
 
 export function SmartSuggestions() {
   const [showMyPlatforms, setShowMyPlatforms] = useState(false);
+  const { data, isLoading, isError } = useSuggestions();
+
+  const suggestions: Suggestion[] =
+    data?.map(mapApiSuggestion) ?? (isError ? mockSuggestions : []);
 
   return (
     <div className="pb-24">
@@ -20,7 +43,6 @@ export function SmartSuggestions() {
         </div>
       </header>
 
-      {/* OTT filter toggle */}
       <div className="px-4 pt-3">
         <button
           onClick={() => setShowMyPlatforms(!showMyPlatforms)}
@@ -39,9 +61,13 @@ export function SmartSuggestions() {
       </div>
 
       <div className="flex flex-col gap-4 px-4">
-        {suggestions.map((s, i) => (
-          <SuggestionCard key={s.id} suggestion={s} index={i} />
-        ))}
+        {isLoading
+          ? Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-80 w-full rounded-2xl" />
+            ))
+          : suggestions.map((s, i) => (
+              <SuggestionCard key={s.id} suggestion={s} index={i} />
+            ))}
       </div>
     </div>
   );

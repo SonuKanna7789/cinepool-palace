@@ -1,14 +1,32 @@
 import { useState } from "react";
-import { pools, OttPlatform, platformNames } from "@/data/mockData";
+import { usePools } from "@/hooks/useApi";
+import { pools as mockPools, OttPlatform, platformNames } from "@/data/mockData";
 import { PoolCard } from "@/components/PoolCard";
 import { MapPin } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { Pool } from "@/data/mockData";
 
 const platforms: (OttPlatform | "all")[] = ["all", "netflix", "disney", "hbo", "prime"];
 
+function mapApiPool(item: any): Pool {
+  return {
+    id: item.id,
+    platform: item.platform?.toLowerCase() ?? "netflix",
+    creator: item.creator ?? "Unknown",
+    plan: item.plan ?? "",
+    pricePerSlot: item.pricePerSlot ?? "$0",
+    filledSlots: item.filledSlots ?? 0,
+    totalSlots: item.totalSlots ?? 4,
+    country: item.country ?? "US",
+    expiresIn: item.expiresIn ?? "—",
+  };
+}
+
 export function OttPooling() {
   const [filter, setFilter] = useState<OttPlatform | "all">("all");
+  const { data, isLoading, isError } = usePools(filter === "all" ? undefined : filter);
 
-  const filtered = filter === "all" ? pools : pools.filter((p) => p.platform === filter);
+  const poolList: Pool[] = data?.map(mapApiPool) ?? (isError ? mockPools.filter((p) => filter === "all" || p.platform === filter) : []);
 
   return (
     <div className="pb-24">
@@ -21,7 +39,6 @@ export function OttPooling() {
         </div>
       </header>
 
-      {/* Platform filter */}
       <div className="flex gap-2 px-4 pt-3 overflow-x-auto scrollbar-hide">
         {platforms.map((p) => (
           <button
@@ -39,9 +56,11 @@ export function OttPooling() {
       </div>
 
       <div className="flex flex-col gap-3 p-4">
-        {filtered.map((pool) => (
-          <PoolCard key={pool.id} pool={pool} />
-        ))}
+        {isLoading
+          ? Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-40 w-full rounded-2xl" />
+            ))
+          : poolList.map((pool) => <PoolCard key={pool.id} pool={pool} />)}
       </div>
     </div>
   );
