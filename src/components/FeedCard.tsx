@@ -16,9 +16,13 @@ export function FeedCard({ post }: { post: FeedPost }) {
 
       {/* User row */}
       <div className="flex items-center gap-3 px-4 pt-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary font-display text-xs font-semibold text-secondary-foreground">
-          {post.user.avatar}
-        </div>
+        {post.user.avatar.startsWith("http") ? (
+          <img src={post.user.avatar} alt={post.user.name} className="h-9 w-9 rounded-full object-cover" />
+        ) : (
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary font-display text-xs font-semibold text-secondary-foreground">
+            {post.user.avatar}
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <span className="font-display font-semibold text-sm truncate">{post.user.name}</span>
