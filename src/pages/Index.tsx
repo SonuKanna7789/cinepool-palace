@@ -12,7 +12,7 @@ const tabs = [SocialFeed, OttPooling, SmartSuggestions, UserProfile];
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState(0);
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user } = useAuth();
   const ActiveComponent = tabs[activeTab];
 
   if (!isLoggedIn) {
