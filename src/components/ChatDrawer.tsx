@@ -246,8 +246,9 @@ export function ChatDrawer({ userId }: ChatDrawerProps) {
 
           try {
             const parsed = JSON.parse(data);
-            if (parsed.content) {
-              assistantContent += parsed.content;
+            const content = parsed.choices?.[0]?.delta?.content ?? parsed.content;
+            if (content) {
+              assistantContent += content;
               setMessages(prev =>
                 prev.map(m =>
                   m.id === assistantId ? { ...m, content: assistantContent } : m
