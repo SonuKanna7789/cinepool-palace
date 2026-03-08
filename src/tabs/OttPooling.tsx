@@ -34,7 +34,8 @@ export function OttPooling() {
   const [filter, setFilter] = useState<OttPlatform | "all">("all");
   const { data, isLoading, isError } = usePools(filter === "all" ? undefined : filter);
 
-  const poolList: Pool[] = data?.map(mapApiPool) ?? (isError ? mockPools.filter((p) => filter === "all" || p.platform === filter) : []);
+  const rawPools = Array.isArray(data) ? data : Array.isArray((data as any)?.items) ? (data as any).items : null;
+  const poolList: Pool[] = rawPools?.map(mapApiPool) ?? (isError ? mockPools.filter((p) => filter === "all" || p.platform === filter) : []);
 
   return (
     <div className="pb-24">
