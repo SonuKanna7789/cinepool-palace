@@ -1,12 +1,30 @@
 import { useState } from "react";
-import { watchedMovies } from "@/data/mockData";
+import { useProfile, useWatchedMovies } from "@/hooks/useApi";
+import { watchedMovies as mockWatched } from "@/data/mockData";
 import { StarRating } from "@/components/StarRating";
 import { Settings, Film, MessageSquare, Clock, CreditCard } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type ProfileTab = "watched" | "reviews" | "pools";
 
 export function UserProfile() {
   const [tab, setTab] = useState<ProfileTab>("watched");
+  const { data: profile } = useProfile();
+  const { data: apiWatched, isError } = useWatchedMovies();
+
+  const watched = apiWatched?.map((m: any) => ({
+    id: m.id,
+    title: m.title,
+    poster: m.posterUrl ?? m.poster ?? "",
+    rating: m.rating,
+    watchedDate: m.watchedDate,
+  })) ?? (isError ? mockWatched : mockWatched);
+
+  const userName = profile?.name ?? "Anika Kumar";
+  const avatar = profile?.avatar ?? "AK";
+  const watchedCount = profile?.watchedCount ?? 247;
+  const reviewCount = profile?.reviewCount ?? 52;
+  const totalSaved = profile?.totalSaved ?? 38;
 
   return (
     <div className="pb-24">
@@ -19,33 +37,31 @@ export function UserProfile() {
         </div>
       </header>
 
-      {/* Profile info */}
       <div className="flex flex-col items-center pt-6 pb-4">
         <div className="h-20 w-20 rounded-full gradient-gold flex items-center justify-center text-2xl font-display font-bold text-primary-foreground">
-          AK
+          {avatar}
         </div>
-        <h2 className="font-display font-bold text-lg mt-3">Anika Kumar</h2>
-        <p className="text-xs text-muted-foreground">Cinephile since 2019 · 247 films watched</p>
+        <h2 className="font-display font-bold text-lg mt-3">{userName}</h2>
+        <p className="text-xs text-muted-foreground">Cinephile · {watchedCount} films watched</p>
 
         <div className="flex items-center gap-6 mt-4">
           <div className="text-center">
-            <p className="font-display font-bold text-lg">247</p>
+            <p className="font-display font-bold text-lg">{watchedCount}</p>
             <p className="text-[10px] text-muted-foreground">Watched</p>
           </div>
           <div className="h-8 w-px bg-border" />
           <div className="text-center">
-            <p className="font-display font-bold text-lg">52</p>
+            <p className="font-display font-bold text-lg">{reviewCount}</p>
             <p className="text-[10px] text-muted-foreground">Reviews</p>
           </div>
           <div className="h-8 w-px bg-border" />
           <div className="text-center">
-            <p className="font-display font-bold text-lg text-primary">$38</p>
+            <p className="font-display font-bold text-lg text-primary">${totalSaved}</p>
             <p className="text-[10px] text-muted-foreground">Saved</p>
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex border-b border-border mx-4">
         {([
           { key: "watched" as const, label: "Watched", icon: Film },
@@ -67,10 +83,9 @@ export function UserProfile() {
         ))}
       </div>
 
-      {/* Tab content */}
       {tab === "watched" && (
         <div className="grid grid-cols-3 gap-2 p-4">
-          {watchedMovies.map((movie) => (
+          {watched.map((movie: any) => (
             <div key={movie.id} className="relative rounded-xl overflow-hidden animate-fade-in">
               <img
                 src={movie.poster}
@@ -90,7 +105,7 @@ export function UserProfile() {
 
       {tab === "reviews" && (
         <div className="p-4 space-y-3">
-          {watchedMovies.slice(0, 3).map((movie) => (
+          {watched.slice(0, 3).map((movie: any) => (
             <div key={movie.id} className="glass rounded-xl p-3 animate-fade-in">
               <div className="flex items-center gap-2">
                 <img src={movie.poster} alt={movie.title} className="h-10 w-7 rounded object-cover" />
@@ -122,22 +137,9 @@ export function UserProfile() {
               <span>Next payment: Mar 1, 2026</span>
             </div>
           </div>
-          <div className="glass rounded-xl p-4 animate-fade-in">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-display font-semibold text-disney">Disney+</p>
-                <p className="text-xs text-muted-foreground">Bundle · Active</p>
-              </div>
-              <p className="font-display font-bold text-foreground">$3.25/mo</p>
-            </div>
-            <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
-              <Clock size={12} />
-              <span>Next payment: Mar 5, 2026</span>
-            </div>
-          </div>
           <div className="glass rounded-xl p-3 text-center">
             <p className="text-xs text-muted-foreground">Total saved this month</p>
-            <p className="font-display font-bold text-2xl text-primary mt-1">$38.50</p>
+            <p className="font-display font-bold text-2xl text-primary mt-1">${totalSaved}.50</p>
           </div>
         </div>
       )}
