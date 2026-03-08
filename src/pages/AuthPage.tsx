@@ -57,7 +57,16 @@ export default function AuthPage() {
         skipAuth: true,
       });
 
-      loginUser(res.token, res.user);
+      loginUser(res.accessToken, {
+        id: res.user.id,
+        name: res.user.name,
+        email: res.user.email,
+        avatar: res.user.avatar,
+        isEnthusiast: res.user.isEnthusiast,
+        watchedCount: 0,
+        reviewCount: 0,
+        totalSaved: 0,
+      });
       toast.success(mode === "register" ? "Welcome to CinePool!" : "Welcome back!");
     } catch (err: any) {
       const msg = err?.message?.includes("401")
