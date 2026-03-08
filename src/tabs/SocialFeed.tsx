@@ -5,28 +5,41 @@ import { Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { FeedPost } from "@/data/mockData";
 
+function safeString(val: unknown, fallback = ""): string {
+  if (val == null) return fallback;
+  if (typeof val === "string") return val;
+  if (typeof val === "number" || typeof val === "boolean") return String(val);
+  return fallback;
+}
+
 function mapApiToFeedPost(item: any): FeedPost {
   return {
-    id: item.id,
+    id: safeString(item.id, crypto.randomUUID()),
     user: {
-      name: item.user?.name ?? "Unknown",
-      avatar: item.user?.avatar ?? "?",
-      isEnthusiast: item.user?.isEnthusiast ?? false,
+      name: safeString(item.user?.name, "Unknown"),
+      avatar: safeString(item.user?.avatar, "?"),
+      isEnthusiast: !!item.user?.isEnthusiast,
     },
     movie: {
-      title: item.movie?.title ?? "",
-      year: item.movie?.year ?? 2025,
-      poster: item.movie?.posterUrl ?? item.movie?.poster ?? "",
-      genre: item.movie?.genre ?? "",
-      rating: item.movie?.rating ?? 0,
-      platforms: item.movie?.platforms ?? [],
+      title: safeString(item.movie?.title),
+      year: Number(item.movie?.year) || 2025,
+      poster: safeString(item.movie?.posterUrl || item.movie?.poster),
+      genre: safeString(item.movie?.genre),
+      rating: Number(item.movie?.rating) || 0,
+      platforms: Array.isArray(item.movie?.platforms)
+        ? item.movie.platforms.filter((p: unknown) => typeof p === "string")
+        : [],
     },
-    review: item.text ?? item.review ?? "",
+    review: safeString(item.text ?? item.review),
     boostedBy: item.boost
-      ? { name: item.boost.name, avatar: item.boost.avatar, comment: item.boost.comment }
+      ? {
+          name: safeString(item.boost.name),
+          avatar: safeString(item.boost.avatar),
+          comment: safeString(item.boost.comment),
+        }
       : undefined,
-    likes: item.likes ?? 0,
-    comments: item.comments ?? 0,
+    likes: Number(item.likes) || 0,
+    comments: Number(item.comments) || 0,
     timeAgo: item.createdAt
       ? new Date(item.createdAt).toLocaleDateString()
       : "recently",
