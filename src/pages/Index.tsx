@@ -23,6 +23,7 @@ const Index = () => {
     <div className="min-h-screen bg-background max-w-lg mx-auto relative">
       <ActiveComponent />
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <ChatDrawer userId={user?.id ?? "anon"} />
     </div>
   );
 };
