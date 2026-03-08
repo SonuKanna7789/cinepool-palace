@@ -22,7 +22,7 @@ export async function register(data: RegisterRequest): Promise<AuthResponse> {
     body: JSON.stringify(data),
     skipAuth: true,
   });
-  setToken(res.token);
+  setToken(res.accessToken);
   return res;
 }
 
@@ -32,7 +32,7 @@ export async function login(data: LoginRequest): Promise<AuthResponse> {
     body: JSON.stringify(data),
     skipAuth: true,
   });
-  setToken(res.token);
+  setToken(res.accessToken);
   return res;
 }
 

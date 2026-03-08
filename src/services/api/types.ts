@@ -1,8 +1,18 @@
 export type OttPlatform = "netflix" | "prime" | "disney" | "hbo";
 
 export interface AuthResponse {
-  token: string;
-  user: UserProfile;
+  accessToken: string;
+  refreshToken: string;
+  user: UserDto;
+}
+
+export interface UserDto {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  isEnthusiast: boolean;
+  createdAt: string;
 }
 
 export interface RegisterRequest {
