@@ -26,8 +26,8 @@ export function SmartSuggestions() {
   const [showMyPlatforms, setShowMyPlatforms] = useState(false);
   const { data, isLoading, isError } = useSuggestions();
 
-  const suggestions: Suggestion[] =
-    data?.map(mapApiSuggestion) ?? (isError ? mockSuggestions : []);
+  const apiSuggestions = Array.isArray(data) ? data.map(mapApiSuggestion) : null;
+  const suggestions: Suggestion[] = apiSuggestions ?? mockSuggestions;
 
   return (
     <div className="pb-24">
