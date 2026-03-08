@@ -14,13 +14,15 @@ export function UserProfile() {
   const { data: apiWatched, isError } = useWatchedMovies();
   const { logout, user } = useAuth();
 
-  const watched = apiWatched?.map((m: any) => ({
-    id: m.id,
-    title: m.title,
-    poster: m.posterUrl ?? m.poster ?? "",
-    rating: m.rating,
-    watchedDate: m.watchedDate,
-  })) ?? (isError ? mockWatched : mockWatched);
+  const watched = Array.isArray(apiWatched)
+    ? apiWatched.map((m: any) => ({
+        id: m.id,
+        title: m.title,
+        poster: m.posterUrl ?? m.poster ?? "",
+        rating: m.rating,
+        watchedDate: m.watchedDate,
+      }))
+    : mockWatched;
 
   const userName = profile?.name ?? "Anika Kumar";
   const avatar = profile?.avatar ?? "AK";
