@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { BottomNav } from "@/components/BottomNav";
+import { ChatDrawer } from "@/components/ChatDrawer";
 import { SocialFeed } from "@/tabs/SocialFeed";
 import { OttPooling } from "@/tabs/OttPooling";
 import { SmartSuggestions } from "@/tabs/SmartSuggestions";
