@@ -12,6 +12,7 @@ export function UserProfile() {
   const [tab, setTab] = useState<ProfileTab>("watched");
   const { data: profile } = useProfile();
   const { data: apiWatched, isError } = useWatchedMovies();
+  const { logout, user } = useAuth();
 
   const watched = apiWatched?.map((m: any) => ({
     id: m.id,
