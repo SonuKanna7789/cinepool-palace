@@ -13,37 +13,57 @@ function safeString(val: unknown, fallback = ""): string {
 }
 
 function mapApiToFeedPost(item: any): FeedPost {
+  // API nests data under item.review { user, movie, text, recentBoosts }
+  const r = item.review ?? item;
+  const user = r.user ?? item.user;
+  const movie = r.movie ?? item.movie;
+  const boosts = Array.isArray(r.recentBoosts) && r.recentBoosts.length > 0
+    ? r.recentBoosts[0]
+    : null;
+
   return {
-    id: safeString(item.id, crypto.randomUUID()),
+    id: safeString(item.id ?? r.id, crypto.randomUUID()),
     user: {
-      name: safeString(item.user?.name, "Unknown"),
-      avatar: safeString(item.user?.avatar, "?"),
-      isEnthusiast: !!item.user?.isEnthusiast,
+      name: safeString(user?.name, "Unknown"),
+      avatar: safeString(user?.avatar, "?"),
+      isEnthusiast: !!user?.isEnthusiast,
     },
     movie: {
-      title: safeString(item.movie?.title),
-      year: Number(item.movie?.year) || 2025,
-      poster: safeString(item.movie?.posterUrl || item.movie?.poster),
-      genre: safeString(item.movie?.genre),
-      rating: Number(item.movie?.rating) || 0,
-      platforms: Array.isArray(item.movie?.platforms)
-        ? item.movie.platforms.filter((p: unknown) => typeof p === "string")
+      title: safeString(movie?.title),
+      year: Number(movie?.year) || 2025,
+      poster: safeString(movie?.posterUrl || movie?.poster),
+      genre: safeString(movie?.genre),
+      rating: Number(movie?.rating) || 0,
+      platforms: Array.isArray(movie?.platforms)
+        ? movie.platforms.filter((p: unknown) => typeof p === "string")
         : [],
     },
-    review: safeString(item.text ?? item.review),
-    boostedBy: item.boost
+    review: safeString(r.text ?? r.review),
+    boostedBy: boosts
       ? {
-          name: safeString(item.boost.name),
-          avatar: safeString(item.boost.avatar),
-          comment: safeString(item.boost.comment),
+          name: safeString(boosts.boosterUser?.name),
+          avatar: safeString(boosts.boosterUser?.avatar),
+          comment: safeString(boosts.comment),
         }
       : undefined,
-    likes: Number(item.likes) || 0,
-    comments: Number(item.comments) || 0,
+    likes: Number(r.boostCount) || 0,
+    comments: 0,
     timeAgo: item.createdAt
-      ? new Date(item.createdAt).toLocaleDateString()
+      ? formatTimeAgo(new Date(item.createdAt))
       : "recently",
   };
+}
+
+function formatTimeAgo(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
 }
 
 export function SocialFeed() {
