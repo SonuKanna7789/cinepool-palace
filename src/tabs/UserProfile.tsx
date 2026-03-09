@@ -3,13 +3,15 @@ import { useProfile, useWatchedMovies } from "@/hooks/useApi";
 import { useAuth } from "@/contexts/AuthContext";
 import { watchedMovies as mockWatched } from "@/data/mockData";
 import { StarRating } from "@/components/StarRating";
-import { Settings, Film, MessageSquare, Clock, CreditCard, LogOut } from "lucide-react";
+import { AddReviewDialog } from "@/components/AddReviewDialog";
+import { Settings, Film, MessageSquare, Clock, CreditCard, LogOut, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type ProfileTab = "watched" | "reviews" | "pools";
 
 export function UserProfile() {
   const [tab, setTab] = useState<ProfileTab>("watched");
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const { data: profile } = useProfile();
   const { data: apiWatched, isError } = useWatchedMovies();
   const { logout, user } = useAuth();
