@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode, useCallback 
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import type { Tables } from "@/integrations/supabase/types";
+import { login as apiLogin, register as apiRegister, clearToken } from "@/services/api";
 
 interface UserProfile extends Tables<'profiles'> {
   email: string;
@@ -89,6 +90,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (error) throw error;
+
+    try {
+      await apiRegister({ email, password, name });
+    } catch (e) {
+      console.error("Failed to register in .NET API", e);
+    }
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
@@ -98,11 +105,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (error) throw error;
+
+    try {
+      const res = await apiLogin({ email, password });
+      localStorage.setItem("cinepool_user", JSON.stringify(res.user));
+    } catch (e) {
+      console.error("Failed to login to .NET API", e);
+    }
   }, []);
 
   const logout = useCallback(async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
+    clearToken();
+    localStorage.removeItem("cinepool_user");
     setUser(null);
   }, []);
 
