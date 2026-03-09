@@ -5,6 +5,7 @@ import { Film, Check, Search, Loader2, ChevronRight, ChevronLeft } from "lucide-
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { updatePreferences } from "@/services/api";
+import { searchTMDBMovies } from "@/services/tmdb";
 
 const GENRES = ["Action", "Drama", "Sci-Fi", "Comedy", "Horror", "Romance", "Documentary", "Thriller", "Animation", "Crime", "Fantasy", "Mystery"];
 const LANGUAGES = ["English", "Hindi", "Spanish", "French", "Korean", "Japanese", "Tamil", "Telugu", "Other"];
@@ -54,9 +55,8 @@ export default function Onboarding() {
   const searchMovies = async (query: string) => {
     setIsSearching(true);
     try {
-      const res = await fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&api_key=${import.meta.env.VITE_TMDB_API_KEY}`);
-      const data = await res.json();
-      setSearchResults(data.results || []);
+      const results = await searchTMDBMovies(query);
+      setSearchResults(results);
     } catch (err) {
       console.error("TMDB Search Error:", err);
     } finally {

@@ -1,7 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
 
-const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 
 interface TMDBMovie {
@@ -14,6 +12,14 @@ interface TMDBMovie {
 // Cache for TMDB posters to avoid duplicate API calls
 const posterCache = new Map<string, string>();
 
+async function tmdbRequest(endpoint: string, params: Record<string, string>) {
+  const { data, error } = await supabase.functions.invoke("tmdb-proxy", {
+    body: { endpoint, params },
+  });
+  if (error) throw error;
+  return data;
+}
+
 export async function getTMDBPoster(movieTitle: string, year?: number): Promise<string> {
   const cacheKey = `${movieTitle}-${year || ""}`;
   if (posterCache.has(cacheKey)) {
@@ -21,9 +27,10 @@ export async function getTMDBPoster(movieTitle: string, year?: number): Promise<
   }
 
   try {
-    const yearParam = year ? `&year=${year}` : "";
-    const res = await fetch(`${TMDB_BASE_URL}/search/movie?query=${encodeURIComponent(movieTitle)}${yearParam}&api_key=${TMDB_API_KEY}`);
-    const data = await res.json();
+    const params: Record<string, string> = { query: movieTitle };
+    if (year) params.year = year.toString();
+    
+    const data = await tmdbRequest("/search/movie", params);
     
     if (data.results && data.results.length > 0) {
       const movie = data.results[0];
@@ -37,14 +44,12 @@ export async function getTMDBPoster(movieTitle: string, year?: number): Promise<
     console.error("TMDB poster fetch error:", err);
   }
 
-  // Fallback: gradient with movie title
   return "";
 }
 
 export async function searchTMDBMovies(query: string): Promise<TMDBMovie[]> {
   try {
-    const res = await fetch(`${TMDB_BASE_URL}/search/movie?query=${encodeURIComponent(query)}&api_key=${TMDB_API_KEY}`);
-    const data = await res.json();
+    const data = await tmdbRequest("/search/movie", { query });
     return data.results || [];
   } catch (err) {
     console.error("TMDB search error:", err);
@@ -54,8 +59,7 @@ export async function searchTMDBMovies(query: string): Promise<TMDBMovie[]> {
 
 export async function searchTMDBTV(query: string): Promise<any[]> {
   try {
-    const res = await fetch(`${TMDB_BASE_URL}/search/tv?query=${encodeURIComponent(query)}&api_key=${TMDB_API_KEY}`);
-    const data = await res.json();
+    const data = await tmdbRequest("/search/tv", { query });
     return data.results || [];
   } catch (err) {
     console.error("TMDB TV search error:", err);
