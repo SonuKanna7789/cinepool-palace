@@ -2,8 +2,32 @@ import { Heart, MessageCircle, Repeat2, Bookmark, Award } from "lucide-react";
 import { FeedPost } from "@/data/mockData";
 import { PlatformBadge } from "./PlatformBadge";
 import { StarRating } from "./StarRating";
+import { boostReview } from "@/services/api";
+import { toast } from "sonner";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
-export function FeedCard({ post }: { post: FeedPost }) {
+interface FeedCardProps {
+  post: FeedPost;
+  onMovieClick?: (movieId: string) => void;
+}
+
+export function FeedCard({ post, onMovieClick }: FeedCardProps) {
+  const queryClient = useQueryClient();
+  const [isBoosting, setIsBoosting] = useState(false);
+
+  const handleBoost = async () => {
+    setIsBoosting(true);
+    try {
+      await boostReview({ reviewId: post.id, comment: "Boosted from feed" });
+      toast.success("Review boosted!");
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
+    } catch (err) {
+      toast.error("Failed to boost review");
+    } finally {
+      setIsBoosting(false);
+    }
+  };
   return (
     <article className="glass rounded-2xl overflow-hidden animate-fade-in">
       {/* Boost header */}
