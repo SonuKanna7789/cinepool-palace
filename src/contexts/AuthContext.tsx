@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode, useCallback 
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import type { Tables } from "@/integrations/supabase/types";
+import { login as apiLogin, register as apiRegister, clearToken } from "@/services/api";
 
 interface UserProfile extends Tables<'profiles'> {
   email: string;
