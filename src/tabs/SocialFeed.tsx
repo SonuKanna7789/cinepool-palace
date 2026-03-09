@@ -31,6 +31,7 @@ function mapApiToFeedPost(item: any): FeedPost {
       isEnthusiast: !!user?.isEnthusiast,
     },
     movie: {
+      id: safeString(movie?.id),
       title: safeString(movie?.title),
       year: Number(movie?.year) || 2025,
       poster: safeString(movie?.posterUrl || movie?.poster),
