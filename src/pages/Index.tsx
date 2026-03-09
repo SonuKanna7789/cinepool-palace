@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { BottomNav } from "@/components/BottomNav";
 import { ChatDrawer } from "@/components/ChatDrawer";
@@ -14,7 +15,20 @@ const tabs = [SocialFeed, OttPooling, SmartSuggestions, UserProfile];
 const Index = () => {
   const [activeTab, setActiveTab] = useState(0);
   const { isLoggedIn, loading, user } = useAuth();
+  const navigate = useNavigate();
   const ActiveComponent = tabs[activeTab];
+
+  useEffect(() => {
+    if (isLoggedIn && !loading) {
+      const onboarded = localStorage.getItem("cinepool_onboarded") === "true";
+      // We could also check user?.is_onboarded if it was updated in real-time, but localStorage is faster
+      if (!onboarded && !user?.is_onboarded) {
+        navigate("/onboarding");
+      } else if (user?.is_onboarded) {
+        localStorage.setItem("cinepool_onboarded", "true");
+      }
+    }
+  }, [isLoggedIn, loading, user, navigate]);
 
   if (loading) {
     return (
