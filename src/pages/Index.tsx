@@ -12,8 +12,19 @@ const tabs = [SocialFeed, OttPooling, SmartSuggestions, UserProfile];
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState(0);
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, loading, user } = useAuth();
   const ActiveComponent = tabs[activeTab];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isLoggedIn) {
     return <AuthPage />;
