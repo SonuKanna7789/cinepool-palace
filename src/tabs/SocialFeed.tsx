@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useFeed } from "@/hooks/useApi";
 import { feedPosts as mockPosts } from "@/data/mockData";
 import { FeedCard } from "@/components/FeedCard";
+import { MovieDetailDialog } from "@/components/MovieDetailDialog";
 import { Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { FeedPost } from "@/data/mockData";
@@ -29,6 +31,7 @@ function mapApiToFeedPost(item: any): FeedPost {
       isEnthusiast: !!user?.isEnthusiast,
     },
     movie: {
+      id: safeString(movie?.id),
       title: safeString(movie?.title),
       year: Number(movie?.year) || 2025,
       poster: safeString(movie?.posterUrl || movie?.poster),
@@ -68,6 +71,7 @@ function formatTimeAgo(date: Date): string {
 
 export function SocialFeed() {
   const { data, isLoading, isError } = useFeed();
+  const [selectedMovieId, setSelectedMovieId] = useState<string | null>(null);
 
   const posts: FeedPost[] =
     data?.items?.map(mapApiToFeedPost) ?? (isError || !data ? mockPosts : []);
@@ -88,8 +92,20 @@ export function SocialFeed() {
           ? Array.from({ length: 3 }).map((_, i) => (
               <Skeleton key={i} className="h-72 w-full rounded-2xl" />
             ))
-          : posts.map((post) => <FeedCard key={post.id} post={post} />)}
+          : posts.map((post) => (
+              <FeedCard 
+                key={post.id} 
+                post={post} 
+                onMovieClick={(id) => setSelectedMovieId(id)}
+              />
+            ))}
       </div>
+
+      <MovieDetailDialog 
+        open={!!selectedMovieId} 
+        onClose={() => setSelectedMovieId(null)} 
+        movieId={selectedMovieId}
+      />
     </div>
   );
 }

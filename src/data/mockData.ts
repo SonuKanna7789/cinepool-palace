@@ -14,6 +14,7 @@ export interface FeedPost {
     isEnthusiast: boolean;
   };
   movie: {
+    id?: string;
     title: string;
     year: number;
     poster: string;

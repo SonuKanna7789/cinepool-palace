@@ -3,13 +3,15 @@ import { useProfile, useWatchedMovies } from "@/hooks/useApi";
 import { useAuth } from "@/contexts/AuthContext";
 import { watchedMovies as mockWatched } from "@/data/mockData";
 import { StarRating } from "@/components/StarRating";
-import { Settings, Film, MessageSquare, Clock, CreditCard, LogOut } from "lucide-react";
+import { AddReviewDialog } from "@/components/AddReviewDialog";
+import { Settings, Film, MessageSquare, Clock, CreditCard, LogOut, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type ProfileTab = "watched" | "reviews" | "pools";
 
 export function UserProfile() {
   const [tab, setTab] = useState<ProfileTab>("watched");
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const { data: profile } = useProfile();
   const { data: apiWatched, isError } = useWatchedMovies();
   const { logout, user } = useAuth();
@@ -36,6 +38,13 @@ export function UserProfile() {
         <div className="flex items-center justify-between">
           <h1 className="font-display font-bold text-xl">Profile</h1>
           <div className="flex items-center gap-1">
+            <button
+              onClick={() => setReviewDialogOpen(true)}
+              className="rounded-full p-2 bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+              title="Add to CinePool"
+            >
+              <Plus size={18} />
+            </button>
             <button className="rounded-full p-2 hover:bg-secondary transition-colors">
               <Settings size={18} className="text-muted-foreground" />
             </button>
@@ -49,6 +58,8 @@ export function UserProfile() {
           </div>
         </div>
       </header>
+
+      <AddReviewDialog open={reviewDialogOpen} onClose={() => setReviewDialogOpen(false)} />
 
       <div className="flex flex-col items-center pt-6 pb-4">
         <div className="h-20 w-20 rounded-full gradient-gold flex items-center justify-center text-2xl font-display font-bold text-primary-foreground">
