@@ -98,8 +98,10 @@ export default function Onboarding() {
     if (!user) return;
     setIsSubmitting(true);
     try {
-      // 1. .NET API
-      await updatePreferences({ favoriteGenres: genres, favoritePlatforms: platforms as any });
+      // 1. .NET API (non-blocking, may fail if user isn't registered there)
+      updatePreferences({ favoriteGenres: genres, favoritePlatforms: platforms as any }).catch(e =>
+        console.warn("Optional .NET API preferences update failed:", e)
+      );
 
       // 2. Supabase preferences
       await supabase.from("user_preferences").insert({
