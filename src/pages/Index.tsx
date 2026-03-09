@@ -7,6 +7,7 @@ import { OttPooling } from "@/tabs/OttPooling";
 import { SmartSuggestions } from "@/tabs/SmartSuggestions";
 import { UserProfile } from "@/tabs/UserProfile";
 import AuthPage from "@/pages/AuthPage";
+import { Loader2 } from "lucide-react";
 
 const tabs = [SocialFeed, OttPooling, SmartSuggestions, UserProfile];
 

@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { z } from "zod";
 import { useAuth } from "@/contexts/AuthContext";
-import { apiClient } from "@/services/api/client";
-import type { AuthResponse } from "@/services/api/types";
 import { Film, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -23,7 +21,7 @@ export default function AuthPage() {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { loginUser } = useAuth();
+  const { signUp, signIn } = useAuth();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -45,35 +43,21 @@ export default function AuthPage() {
 
     setLoading(true);
     try {
-      const endpoint = mode === "register" ? "/auth/register" : "/auth/login";
-      const body =
-        mode === "register"
-          ? { name: name.trim(), email: email.trim(), password }
-          : { email: email.trim(), password };
-
-      const res = await apiClient<AuthResponse>(endpoint, {
-        method: "POST",
-        body: JSON.stringify(body),
-        skipAuth: true,
-      });
-
-      loginUser(res.accessToken, {
-        id: res.user.id,
-        name: res.user.name,
-        email: res.user.email,
-        avatar: res.user.avatar,
-        isEnthusiast: res.user.isEnthusiast,
-        watchedCount: 0,
-        reviewCount: 0,
-        totalSaved: 0,
-      });
-      toast.success(mode === "register" ? "Welcome to CinePool!" : "Welcome back!");
+      if (mode === "register") {
+        await signUp(email.trim(), password, name.trim());
+        toast.success("Account created! Please check your email to verify your account.");
+      } else {
+        await signIn(email.trim(), password);
+        toast.success("Welcome back!");
+      }
     } catch (err: any) {
-      const msg = err?.message?.includes("401")
+      const msg = err?.message?.includes("Invalid login credentials")
         ? "Invalid email or password"
-        : err?.message?.includes("409")
+        : err?.message?.includes("User already registered")
         ? "Email already registered"
-        : "Something went wrong. Please try again.";
+        : err?.message?.includes("Email not confirmed")
+        ? "Please check your email and click the confirmation link"
+        : err?.message || "Something went wrong. Please try again.";
       toast.error(msg);
     } finally {
       setLoading(false);
