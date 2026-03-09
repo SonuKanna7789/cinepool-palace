@@ -67,12 +67,12 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
 
     setIsSubmitting(true);
     try {
-      // 1. .NET API
-      await createReview({
+      // 1. .NET API (non-blocking, may fail if user isn't registered there)
+      createReview({
         movieId: selectedItem.id.toString(),
         text: reviewText,
         rating,
-      });
+      }).catch(e => console.warn("Optional .NET API review creation failed:", e));
 
       // 2. Supabase user_reviews
       await supabase.from("user_reviews").insert({
