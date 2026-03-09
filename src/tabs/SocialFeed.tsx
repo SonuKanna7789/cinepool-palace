@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useFeed } from "@/hooks/useApi";
 import { feedPosts as mockPosts } from "@/data/mockData";
 import { FeedCard } from "@/components/FeedCard";
+import { MovieDetailDialog } from "@/components/MovieDetailDialog";
 import { Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { FeedPost } from "@/data/mockData";
