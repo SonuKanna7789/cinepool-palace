@@ -71,7 +71,10 @@ export function FeedCard({ post, onMovieClick }: FeedCardProps) {
       )}
 
       {/* Movie poster */}
-      <div className="relative mx-4 mt-3 overflow-hidden rounded-xl">
+      <div 
+        className="relative mx-4 mt-3 overflow-hidden rounded-xl cursor-pointer"
+        onClick={() => onMovieClick?.(post.movie.id || post.movie.title.toLowerCase().replace(/\s+/g, '-'))}
+      >
         <img
           src={post.movie.poster}
           alt={post.movie.title}
@@ -80,7 +83,7 @@ export function FeedCard({ post, onMovieClick }: FeedCardProps) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-3">
-          <h3 className="font-display font-bold text-base">{post.movie.title}</h3>
+          <h3 className="font-display font-bold text-base hover:underline">{post.movie.title}</h3>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-xs text-muted-foreground">{post.movie.year} · {post.movie.genre}</span>
             <StarRating rating={Math.round(post.movie.rating)} size={12} />
