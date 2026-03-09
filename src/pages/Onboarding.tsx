@@ -54,9 +54,8 @@ export default function Onboarding() {
   const searchMovies = async (query: string) => {
     setIsSearching(true);
     try {
-      const res = await fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}&api_key=${import.meta.env.VITE_TMDB_API_KEY}`);
-      const data = await res.json();
-      setSearchResults(data.results || []);
+      const results = await searchTMDBMovies(query);
+      setSearchResults(results);
     } catch (err) {
       console.error("TMDB Search Error:", err);
     } finally {
