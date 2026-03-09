@@ -5,6 +5,7 @@ import { Film, Check, Search, Loader2, ChevronRight, ChevronLeft } from "lucide-
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { updatePreferences } from "@/services/api";
+import { searchTMDBMovies } from "@/services/tmdb";
 
 const GENRES = ["Action", "Drama", "Sci-Fi", "Comedy", "Horror", "Romance", "Documentary", "Thriller", "Animation", "Crime", "Fantasy", "Mystery"];
 const LANGUAGES = ["English", "Hindi", "Spanish", "French", "Korean", "Japanese", "Tamil", "Telugu", "Other"];
