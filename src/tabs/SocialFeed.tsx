@@ -71,6 +71,7 @@ function formatTimeAgo(date: Date): string {
 
 export function SocialFeed() {
   const { data, isLoading, isError } = useFeed();
+  const [selectedMovieId, setSelectedMovieId] = useState<string | null>(null);
 
   const posts: FeedPost[] =
     data?.items?.map(mapApiToFeedPost) ?? (isError || !data ? mockPosts : []);
@@ -91,8 +92,20 @@ export function SocialFeed() {
           ? Array.from({ length: 3 }).map((_, i) => (
               <Skeleton key={i} className="h-72 w-full rounded-2xl" />
             ))
-          : posts.map((post) => <FeedCard key={post.id} post={post} />)}
+          : posts.map((post) => (
+              <FeedCard 
+                key={post.id} 
+                post={post} 
+                onMovieClick={(id) => setSelectedMovieId(id)}
+              />
+            ))}
       </div>
+
+      <MovieDetailDialog 
+        open={!!selectedMovieId} 
+        onClose={() => setSelectedMovieId(null)} 
+        movieId={selectedMovieId}
+      />
     </div>
   );
 }

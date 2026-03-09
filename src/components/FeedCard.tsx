@@ -110,7 +110,7 @@ export function FeedCard({ post, onMovieClick }: FeedCardProps) {
             <MessageCircle size={16} />
             <span className="text-xs">{post.comments}</span>
           </button>
-          <button className="text-muted-foreground hover:text-primary transition-colors">
+          <button onClick={handleBoost} disabled={isBoosting} className={`text-muted-foreground hover:text-primary transition-colors ${isBoosting ? 'opacity-50' : ''}`}>
             <Repeat2 size={16} />
           </button>
         </div>
