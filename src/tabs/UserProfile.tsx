@@ -109,18 +109,15 @@ export function UserProfile() {
 
       {tab === "watched" && (
         <div className="grid grid-cols-3 gap-2 p-4">
-          {watched.map((movie: any) => (
-            <div key={movie.id} className="relative rounded-xl overflow-hidden animate-fade-in">
-              <img
-                src={movie.poster}
-                alt={movie.title}
-                className="w-full aspect-[2/3] object-cover"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-2">
-                <p className="text-[10px] font-medium truncate">{movie.title}</p>
-                <StarRating rating={movie.rating} size={10} />
+          {watchHistory.length === 0 ? (
+            <p className="col-span-3 text-center text-sm text-muted-foreground py-8">No movies watched yet. Add your first review!</p>
+          ) : watchHistory.map((movie: any) => (
+            <div key={movie.id} className="relative rounded-xl overflow-hidden animate-fade-in bg-secondary">
+              <div className="w-full aspect-[2/3] flex items-center justify-center p-2">
+                <p className="text-[10px] font-medium text-center">{movie.movie_title}</p>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-background/80 to-transparent">
+                <StarRating rating={movie.rating || 0} size={10} />
               </div>
             </div>
           ))}
