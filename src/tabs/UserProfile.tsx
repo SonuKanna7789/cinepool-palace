@@ -126,18 +126,19 @@ export function UserProfile() {
 
       {tab === "reviews" && (
         <div className="p-4 space-y-3">
-          {watched.slice(0, 3).map((movie: any) => (
-            <div key={movie.id} className="glass rounded-xl p-3 animate-fade-in">
+          {reviews.length === 0 ? (
+            <p className="text-center text-sm text-muted-foreground py-8">No reviews yet.</p>
+          ) : reviews.map((review: any) => (
+            <div key={review.id} className="glass rounded-xl p-3 animate-fade-in">
               <div className="flex items-center gap-2">
-                <img src={movie.poster} alt={movie.title} className="h-10 w-7 rounded object-cover" />
                 <div>
-                  <p className="text-sm font-medium">{movie.title}</p>
-                  <StarRating rating={movie.rating} size={10} />
+                  <p className="text-sm font-medium">Movie #{review.movie_id}</p>
+                  <StarRating rating={review.rating} size={10} />
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                A truly memorable experience. Would recommend to anyone looking for quality cinema.
-              </p>
+              {review.review_text && (
+                <p className="text-xs text-muted-foreground mt-2">{review.review_text}</p>
+              )}
             </div>
           ))}
         </div>
