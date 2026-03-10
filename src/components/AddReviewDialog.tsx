@@ -76,7 +76,7 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
 
       // 2. Supabase user_reviews
       await supabase.from("user_reviews").insert({
-        user_id: user.id,
+        user_id: user.user_id,
         movie_id: selectedItem.id.toString(),
         review_text: reviewText || null,
         rating,
@@ -87,7 +87,7 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
       // 3. Supabase user_watch_history
       const firstGenre = selectedItem.genre_ids?.[0] || selectedItem.genres?.[0]?.id || null;
       await supabase.from("user_watch_history").insert({
-        user_id: user.id,
+        user_id: user.user_id,
         movie_id: selectedItem.id.toString(),
         movie_title: selectedItem.title || selectedItem.name,
         genre: firstGenre?.toString() || null,

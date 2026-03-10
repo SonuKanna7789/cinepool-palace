@@ -105,7 +105,7 @@ export default function Onboarding() {
 
       // 2. Supabase preferences
       await supabase.from("user_preferences").insert({
-        user_id: user.id,
+        user_id: user.user_id,
         favorite_genres: genres,
         favorite_platforms: platforms,
         preferred_languages: [language]
@@ -113,7 +113,7 @@ export default function Onboarding() {
 
       // 3. Supabase watch history
       const historyData = selectedMovies.map(m => ({
-        user_id: user.id,
+        user_id: user.user_id,
         movie_id: m.id.toString(),
         movie_title: m.title,
         genre: m.genre_ids?.[0]?.toString() || "Unknown",
@@ -122,7 +122,7 @@ export default function Onboarding() {
       await supabase.from("user_watch_history").insert(historyData);
 
       // Mark profile as onboarded
-      await supabase.from("profiles").update({ is_onboarded: true }).eq("id", user.id);
+      await supabase.from("profiles").update({ is_onboarded: true }).eq("user_id", user.user_id);
 
       localStorage.setItem("cinepool_onboarded", "true");
       navigate("/");
