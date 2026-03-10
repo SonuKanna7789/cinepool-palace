@@ -1,36 +1,36 @@
-import { useState } from "react";
-import { useProfile, useWatchedMovies } from "@/hooks/useApi";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { watchedMovies as mockWatched } from "@/data/mockData";
+import { supabase } from "@/integrations/supabase/client";
 import { StarRating } from "@/components/StarRating";
 import { AddReviewDialog } from "@/components/AddReviewDialog";
 import { Settings, Film, MessageSquare, Clock, CreditCard, LogOut, Plus } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 type ProfileTab = "watched" | "reviews" | "pools";
 
 export function UserProfile() {
   const [tab, setTab] = useState<ProfileTab>("watched");
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
-  const { data: profile } = useProfile();
-  const { data: apiWatched, isError } = useWatchedMovies();
   const { logout, user } = useAuth();
+  const [watchHistory, setWatchHistory] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
 
-  const watched = Array.isArray(apiWatched)
-    ? apiWatched.map((m: any) => ({
-        id: m.id,
-        title: m.title,
-        poster: m.posterUrl ?? m.poster ?? "",
-        rating: m.rating,
-        watchedDate: m.watchedDate,
-      }))
-    : mockWatched;
+  useEffect(() => {
+    if (!user) return;
+    const loadData = async () => {
+      const [historyRes, reviewsRes] = await Promise.all([
+        supabase.from("user_watch_history").select("*").eq("user_id", user.user_id).order("watched_at", { ascending: false }),
+        supabase.from("user_reviews").select("*").eq("user_id", user.user_id).order("created_at", { ascending: false }),
+      ]);
+      setWatchHistory(historyRes.data || []);
+      setReviews(reviewsRes.data || []);
+    };
+    loadData();
+  }, [user]);
 
-  const userName = profile?.name ?? "Anika Kumar";
-  const avatar = profile?.avatar ?? "AK";
-  const watchedCount = profile?.watchedCount ?? 247;
-  const reviewCount = profile?.reviewCount ?? 52;
-  const totalSaved = profile?.totalSaved ?? 38;
+  const userName = user?.display_name || "User";
+  const initials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+  const watchedCount = watchHistory.length;
+  const reviewCount = reviews.length;
 
   return (
     <div className="pb-24">
