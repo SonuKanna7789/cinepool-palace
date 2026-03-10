@@ -76,7 +76,7 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
 
       // 2. Supabase user_reviews
       await supabase.from("user_reviews").insert({
-        user_id: user.id,
+        user_id: user.user_id,
         movie_id: selectedItem.id.toString(),
         review_text: reviewText || null,
         rating,
