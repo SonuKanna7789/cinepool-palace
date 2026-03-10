@@ -63,7 +63,7 @@ export function UserProfile() {
 
       <div className="flex flex-col items-center pt-6 pb-4">
         <div className="h-20 w-20 rounded-full gradient-gold flex items-center justify-center text-2xl font-display font-bold text-primary-foreground">
-          {avatar}
+          {initials}
         </div>
         <h2 className="font-display font-bold text-lg mt-3">{userName}</h2>
         <p className="text-xs text-muted-foreground">Cinephile · {watchedCount} films watched</p>
