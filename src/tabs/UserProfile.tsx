@@ -161,7 +161,7 @@ export function UserProfile() {
           </div>
           <div className="glass rounded-xl p-3 text-center">
             <p className="text-xs text-muted-foreground">Total saved this month</p>
-            <p className="font-display font-bold text-2xl text-primary mt-1">${totalSaved}.50</p>
+            <p className="font-display font-bold text-2xl text-primary mt-1">$0.00</p>
           </div>
         </div>
       )}
