@@ -122,7 +122,7 @@ export default function Onboarding() {
       await supabase.from("user_watch_history").insert(historyData);
 
       // Mark profile as onboarded
-      await supabase.from("profiles").update({ is_onboarded: true }).eq("id", user.id);
+      await supabase.from("profiles").update({ is_onboarded: true }).eq("user_id", user.user_id);
 
       localStorage.setItem("cinepool_onboarded", "true");
       navigate("/");

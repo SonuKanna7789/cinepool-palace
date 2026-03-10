@@ -19,7 +19,7 @@ export function SmartSuggestions() {
     
     setIsLoading(true);
     try {
-      const data = await getSuggestions(user.id, forceRefresh);
+      const data = await getSuggestions(user.user_id, forceRefresh);
       const newSuggestions = data.suggestions || [];
       setSuggestions(newSuggestions);
       setCurrentIndex(0);
