@@ -52,7 +52,7 @@ export function SmartSuggestions() {
     const movieId = `${suggestion.title.toLowerCase().replace(/\s+/g, "-")}-${suggestion.year}`;
 
     try {
-      await submitSuggestionFeedback(user.id, movieId, action);
+      await submitSuggestionFeedback(user.user_id, movieId, action);
       
       if (action === "like") {
         toast.success(`Added ${suggestion.title} to your likes!`);
