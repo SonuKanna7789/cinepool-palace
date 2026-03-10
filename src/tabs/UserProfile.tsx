@@ -80,7 +80,7 @@ export function UserProfile() {
           </div>
           <div className="h-8 w-px bg-border" />
           <div className="text-center">
-            <p className="font-display font-bold text-lg text-primary">${totalSaved}</p>
+            <p className="font-display font-bold text-lg text-primary">$0</p>
             <p className="text-[10px] text-muted-foreground">Saved</p>
           </div>
         </div>
