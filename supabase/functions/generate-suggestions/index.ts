@@ -53,6 +53,8 @@ serve(async (req) => {
     const likedMovies = feedback?.filter(f => f.action === "like").map(f => f.movie_id) || [];
     const dislikedMovies = feedback?.filter(f => f.action === "dislike").map(f => f.movie_id) || [];
 
+    const allShownMovies = feedback?.map(f => f.movie_id) || [];
+
     const prompt = `You are a movie recommendation AI. Generate 5 personalized movie suggestions based on the user's preferences.
 
 User Profile:
@@ -61,6 +63,7 @@ User Profile:
 - Recently Watched: ${recentMovies.join(", ") || "None"}
 - Liked Suggestions: ${likedMovies.join(", ") || "None"}
 - Disliked Suggestions: ${dislikedMovies.join(", ") || "None"}
+- Already Shown (DO NOT repeat these): ${allShownMovies.join(", ") || "None"}
 
 Provide exactly 5 movie recommendations as a JSON array with the following structure:
 [
@@ -78,9 +81,9 @@ Provide exactly 5 movie recommendations as a JSON array with the following struc
 Important:
 - matchPercent should be between 70-99
 - platforms should be an array of: netflix, prime, disney, hbo, apple
-- Avoid movies the user has disliked
+- NEVER suggest movies the user has already seen, disliked, or that were already shown
 - Prioritize genres and platforms the user prefers
-- Provide diverse recommendations
+- Provide diverse and FRESH recommendations the user hasn't seen before
 - Return ONLY the JSON array, no other text`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -92,7 +95,7 @@ Important:
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.8,
+        temperature: 1.0,
       }),
     });
 
