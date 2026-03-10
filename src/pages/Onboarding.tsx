@@ -113,7 +113,7 @@ export default function Onboarding() {
 
       // 3. Supabase watch history
       const historyData = selectedMovies.map(m => ({
-        user_id: user.id,
+        user_id: user.user_id,
         movie_id: m.id.toString(),
         movie_title: m.title,
         genre: m.genre_ids?.[0]?.toString() || "Unknown",
