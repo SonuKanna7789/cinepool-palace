@@ -95,7 +95,7 @@ Important:
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.8,
+        temperature: 1.0,
       }),
     });
 
