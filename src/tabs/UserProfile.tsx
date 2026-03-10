@@ -60,7 +60,7 @@ export function UserProfile() {
         </div>
       </header>
 
-      <AddReviewDialog open={reviewDialogOpen} onClose={() => setReviewDialogOpen(false)} />
+      <AddReviewDialog open={reviewDialogOpen} onClose={() => { setReviewDialogOpen(false); loadData(); }} />
 
       <div className="flex flex-col items-center pt-6 pb-4">
         <div className="h-20 w-20 rounded-full gradient-gold flex items-center justify-center text-2xl font-display font-bold text-primary-foreground">
