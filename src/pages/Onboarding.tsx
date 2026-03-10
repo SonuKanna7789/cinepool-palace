@@ -105,7 +105,7 @@ export default function Onboarding() {
 
       // 2. Supabase preferences
       await supabase.from("user_preferences").insert({
-        user_id: user.id,
+        user_id: user.user_id,
         favorite_genres: genres,
         favorite_platforms: platforms,
         preferred_languages: [language]
