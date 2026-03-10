@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { StarRating } from "@/components/StarRating";
@@ -14,18 +14,19 @@ export function UserProfile() {
   const [watchHistory, setWatchHistory] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
 
-  useEffect(() => {
+  const loadData = useCallback(async () => {
     if (!user) return;
-    const loadData = async () => {
-      const [historyRes, reviewsRes] = await Promise.all([
-        supabase.from("user_watch_history").select("*").eq("user_id", user.user_id).order("watched_at", { ascending: false }),
-        supabase.from("user_reviews").select("*").eq("user_id", user.user_id).order("created_at", { ascending: false }),
-      ]);
-      setWatchHistory(historyRes.data || []);
-      setReviews(reviewsRes.data || []);
-    };
-    loadData();
+    const [historyRes, reviewsRes] = await Promise.all([
+      supabase.from("user_watch_history").select("*").eq("user_id", user.user_id).order("watched_at", { ascending: false }),
+      supabase.from("user_reviews").select("*").eq("user_id", user.user_id).order("created_at", { ascending: false }),
+    ]);
+    setWatchHistory(historyRes.data || []);
+    setReviews(reviewsRes.data || []);
   }, [user]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const userName = user?.display_name || "User";
   const initials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
