@@ -1,36 +1,36 @@
-import { useState } from "react";
-import { useProfile, useWatchedMovies } from "@/hooks/useApi";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { watchedMovies as mockWatched } from "@/data/mockData";
+import { supabase } from "@/integrations/supabase/client";
 import { StarRating } from "@/components/StarRating";
 import { AddReviewDialog } from "@/components/AddReviewDialog";
 import { Settings, Film, MessageSquare, Clock, CreditCard, LogOut, Plus } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 type ProfileTab = "watched" | "reviews" | "pools";
 
 export function UserProfile() {
   const [tab, setTab] = useState<ProfileTab>("watched");
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
-  const { data: profile } = useProfile();
-  const { data: apiWatched, isError } = useWatchedMovies();
   const { logout, user } = useAuth();
+  const [watchHistory, setWatchHistory] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
 
-  const watched = Array.isArray(apiWatched)
-    ? apiWatched.map((m: any) => ({
-        id: m.id,
-        title: m.title,
-        poster: m.posterUrl ?? m.poster ?? "",
-        rating: m.rating,
-        watchedDate: m.watchedDate,
-      }))
-    : mockWatched;
+  useEffect(() => {
+    if (!user) return;
+    const loadData = async () => {
+      const [historyRes, reviewsRes] = await Promise.all([
+        supabase.from("user_watch_history").select("*").eq("user_id", user.user_id).order("watched_at", { ascending: false }),
+        supabase.from("user_reviews").select("*").eq("user_id", user.user_id).order("created_at", { ascending: false }),
+      ]);
+      setWatchHistory(historyRes.data || []);
+      setReviews(reviewsRes.data || []);
+    };
+    loadData();
+  }, [user]);
 
-  const userName = profile?.name ?? "Anika Kumar";
-  const avatar = profile?.avatar ?? "AK";
-  const watchedCount = profile?.watchedCount ?? 247;
-  const reviewCount = profile?.reviewCount ?? 52;
-  const totalSaved = profile?.totalSaved ?? 38;
+  const userName = user?.display_name || "User";
+  const initials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+  const watchedCount = watchHistory.length;
+  const reviewCount = reviews.length;
 
   return (
     <div className="pb-24">
@@ -63,7 +63,7 @@ export function UserProfile() {
 
       <div className="flex flex-col items-center pt-6 pb-4">
         <div className="h-20 w-20 rounded-full gradient-gold flex items-center justify-center text-2xl font-display font-bold text-primary-foreground">
-          {avatar}
+          {initials}
         </div>
         <h2 className="font-display font-bold text-lg mt-3">{userName}</h2>
         <p className="text-xs text-muted-foreground">Cinephile · {watchedCount} films watched</p>
@@ -80,7 +80,7 @@ export function UserProfile() {
           </div>
           <div className="h-8 w-px bg-border" />
           <div className="text-center">
-            <p className="font-display font-bold text-lg text-primary">${totalSaved}</p>
+            <p className="font-display font-bold text-lg text-primary">$0</p>
             <p className="text-[10px] text-muted-foreground">Saved</p>
           </div>
         </div>
@@ -109,18 +109,15 @@ export function UserProfile() {
 
       {tab === "watched" && (
         <div className="grid grid-cols-3 gap-2 p-4">
-          {watched.map((movie: any) => (
-            <div key={movie.id} className="relative rounded-xl overflow-hidden animate-fade-in">
-              <img
-                src={movie.poster}
-                alt={movie.title}
-                className="w-full aspect-[2/3] object-cover"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-2">
-                <p className="text-[10px] font-medium truncate">{movie.title}</p>
-                <StarRating rating={movie.rating} size={10} />
+          {watchHistory.length === 0 ? (
+            <p className="col-span-3 text-center text-sm text-muted-foreground py-8">No movies watched yet. Add your first review!</p>
+          ) : watchHistory.map((movie: any) => (
+            <div key={movie.id} className="relative rounded-xl overflow-hidden animate-fade-in bg-secondary">
+              <div className="w-full aspect-[2/3] flex items-center justify-center p-2">
+                <p className="text-[10px] font-medium text-center">{movie.movie_title}</p>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-background/80 to-transparent">
+                <StarRating rating={movie.rating || 0} size={10} />
               </div>
             </div>
           ))}
@@ -129,18 +126,19 @@ export function UserProfile() {
 
       {tab === "reviews" && (
         <div className="p-4 space-y-3">
-          {watched.slice(0, 3).map((movie: any) => (
-            <div key={movie.id} className="glass rounded-xl p-3 animate-fade-in">
+          {reviews.length === 0 ? (
+            <p className="text-center text-sm text-muted-foreground py-8">No reviews yet.</p>
+          ) : reviews.map((review: any) => (
+            <div key={review.id} className="glass rounded-xl p-3 animate-fade-in">
               <div className="flex items-center gap-2">
-                <img src={movie.poster} alt={movie.title} className="h-10 w-7 rounded object-cover" />
                 <div>
-                  <p className="text-sm font-medium">{movie.title}</p>
-                  <StarRating rating={movie.rating} size={10} />
+                  <p className="text-sm font-medium">Movie #{review.movie_id}</p>
+                  <StarRating rating={review.rating} size={10} />
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                A truly memorable experience. Would recommend to anyone looking for quality cinema.
-              </p>
+              {review.review_text && (
+                <p className="text-xs text-muted-foreground mt-2">{review.review_text}</p>
+              )}
             </div>
           ))}
         </div>
@@ -163,7 +161,7 @@ export function UserProfile() {
           </div>
           <div className="glass rounded-xl p-3 text-center">
             <p className="text-xs text-muted-foreground">Total saved this month</p>
-            <p className="font-display font-bold text-2xl text-primary mt-1">${totalSaved}.50</p>
+            <p className="font-display font-bold text-2xl text-primary mt-1">$0.00</p>
           </div>
         </div>
       )}
