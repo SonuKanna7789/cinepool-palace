@@ -125,7 +125,7 @@ Important:
   } catch (error) {
     console.error("Edge function error:", error);
     return new Response(
-      JSON.stringify({ error: error.message, suggestions: generateFallbackSuggestions(), cached: false }),
+      JSON.stringify({ error: (error as Error).message, suggestions: generateFallbackSuggestions(), cached: false }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
