@@ -1,18 +1,11 @@
-<<<<<<< HEAD
 import { useState, useEffect } from "react";
-=======
-import { useState } from "react";
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
 import { useFeed } from "@/hooks/useApi";
 import { feedPosts as mockPosts } from "@/data/mockData";
 import { FeedCard } from "@/components/FeedCard";
 import { MovieDetailDialog } from "@/components/MovieDetailDialog";
 import { Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-<<<<<<< HEAD
 import { getTMDBPoster } from "@/services/tmdb";
-=======
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
 import type { FeedPost } from "@/data/mockData";
 
 function safeString(val: unknown, fallback = ""): string {
@@ -23,14 +16,8 @@ function safeString(val: unknown, fallback = ""): string {
 }
 
 function mapApiToFeedPost(item: any): FeedPost {
-<<<<<<< HEAD
-  const r     = item.review ?? item;
-  const user  = r.user  ?? item.user;
-=======
-  // API nests data under item.review { user, movie, text, recentBoosts }
   const r = item.review ?? item;
   const user = r.user ?? item.user;
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
   const movie = r.movie ?? item.movie;
   const boosts = Array.isArray(r.recentBoosts) && r.recentBoosts.length > 0
     ? r.recentBoosts[0]
@@ -39,20 +26,6 @@ function mapApiToFeedPost(item: any): FeedPost {
   return {
     id: safeString(item.id ?? r.id, crypto.randomUUID()),
     user: {
-<<<<<<< HEAD
-      name:         safeString(user?.name, "Unknown"),
-      avatar:       safeString(user?.avatar, "?"),
-      isEnthusiast: !!user?.isEnthusiast,
-    },
-    movie: {
-      id:        safeString(movie?.id),
-      title:     safeString(movie?.title),
-      year:      Number(movie?.year) || 2025,
-      // FIX: posterUrl may be empty - we'll patch it after with TMDB
-      poster:    safeString(movie?.posterUrl || movie?.poster),
-      genre:     safeString(movie?.genre),
-      rating:    Number(movie?.rating) || 0,
-=======
       name: safeString(user?.name, "Unknown"),
       avatar: safeString(user?.avatar, "?"),
       isEnthusiast: !!user?.isEnthusiast,
@@ -64,22 +37,10 @@ function mapApiToFeedPost(item: any): FeedPost {
       poster: safeString(movie?.posterUrl || movie?.poster),
       genre: safeString(movie?.genre),
       rating: Number(movie?.rating) || 0,
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
       platforms: Array.isArray(movie?.platforms)
         ? movie.platforms.filter((p: unknown) => typeof p === "string")
         : [],
     },
-<<<<<<< HEAD
-    review:   safeString(r.text ?? r.review),
-    boostedBy: boosts
-      ? {
-          name:    safeString(boosts.boosterUser?.name),
-          avatar:  safeString(boosts.boosterUser?.avatar),
-          comment: safeString(boosts.comment),
-        }
-      : undefined,
-    likes:   Number(r.boostCount) || 0,
-=======
     review: safeString(r.text ?? r.review),
     boostedBy: boosts
       ? {
@@ -89,7 +50,6 @@ function mapApiToFeedPost(item: any): FeedPost {
         }
       : undefined,
     likes: Number(r.boostCount) || 0,
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
     comments: 0,
     timeAgo: item.createdAt
       ? formatTimeAgo(new Date(item.createdAt))
@@ -98,12 +58,7 @@ function mapApiToFeedPost(item: any): FeedPost {
 }
 
 function formatTimeAgo(date: Date): string {
-<<<<<<< HEAD
-  const diffMs   = Date.now() - date.getTime();
-=======
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
+  const diffMs = Date.now() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   if (diffMins < 60) return `${diffMins}m ago`;
   const diffHours = Math.floor(diffMins / 60);
@@ -116,10 +71,8 @@ function formatTimeAgo(date: Date): string {
 export function SocialFeed() {
   const { data, isLoading, isError } = useFeed();
   const [selectedMovieId, setSelectedMovieId] = useState<string | null>(null);
-<<<<<<< HEAD
   const [posts, setPosts] = useState<FeedPost[]>([]);
 
-  // FIX: After loading API data, backfill TMDB posters for movies with no posterUrl
   useEffect(() => {
     if (!data?.items) {
       if (isError) setPosts(mockPosts);
@@ -127,13 +80,12 @@ export function SocialFeed() {
     }
 
     const mapped = data.items.map(mapApiToFeedPost);
-    setPosts(mapped); // show immediately with whatever we have
+    setPosts(mapped);
 
-    // Then asynchronously patch in TMDB posters for any without one
     const patchPosters = async () => {
       const patched = await Promise.all(
         mapped.map(async (post) => {
-          if (post.movie.poster) return post; // already has poster
+          if (post.movie.poster) return post;
           try {
             const tmdbPoster = await getTMDBPoster(post.movie.title, post.movie.year);
             if (tmdbPoster) {
@@ -148,11 +100,6 @@ export function SocialFeed() {
 
     patchPosters();
   }, [data, isError]);
-=======
-
-  const posts: FeedPost[] =
-    data?.items?.map(mapApiToFeedPost) ?? (isError || !data ? mockPosts : []);
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
 
   return (
     <div className="pb-24">
@@ -171,29 +118,17 @@ export function SocialFeed() {
               <Skeleton key={i} className="h-72 w-full rounded-2xl" />
             ))
           : posts.map((post) => (
-<<<<<<< HEAD
               <FeedCard
                 key={post.id}
                 post={post}
-=======
-              <FeedCard 
-                key={post.id} 
-                post={post} 
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
                 onMovieClick={(id) => setSelectedMovieId(id)}
               />
             ))}
       </div>
 
-<<<<<<< HEAD
       <MovieDetailDialog
         open={!!selectedMovieId}
         onClose={() => setSelectedMovieId(null)}
-=======
-      <MovieDetailDialog 
-        open={!!selectedMovieId} 
-        onClose={() => setSelectedMovieId(null)} 
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
         movieId={selectedMovieId}
       />
     </div>
