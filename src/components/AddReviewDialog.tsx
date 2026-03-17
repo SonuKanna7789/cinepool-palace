@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+<<<<<<< HEAD
 import { X, Globe, Lock, Loader2 } from "lucide-react";
+=======
+import { X, Check, Globe, Lock, Loader2 } from "lucide-react";
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
 import { StarRating } from "./StarRating";
 import { searchTMDBMovies, searchTMDBTV } from "@/services/tmdb";
 import { createReview } from "@/services/api";
@@ -21,6 +25,7 @@ type SearchType = "movie" | "series";
 export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+<<<<<<< HEAD
 
   const [type,         setType        ] = useState<SearchType>("movie");
   const [searchQuery,  setSearchQuery ] = useState("");
@@ -32,14 +37,37 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
   const [rating,       setRating      ] = useState(0);
   const [reviewText,   setReviewText  ] = useState("");
   const [isPublic,     setIsPublic    ] = useState(true);
+=======
+  
+  const [type, setType] = useState<SearchType>("movie");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  
+  const [platform, setPlatform] = useState("");
+  const [rating, setRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [isPublic, setIsPublic] = useState(true);
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
+<<<<<<< HEAD
     if (query.length < 2) { setSearchResults([]); return; }
     setIsSearching(true);
     try {
       const results = type === "movie"
+=======
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const results = type === "movie" 
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
         ? await searchTMDBMovies(query)
         : await searchTMDBTV(query);
       setSearchResults(results);
@@ -58,12 +86,17 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
 
   const handleSubmit = async () => {
     if (!selectedItem || !user || rating === 0) {
+<<<<<<< HEAD
       toast.error("Please select a movie and give a rating");
+=======
+      toast.error("Please complete all required fields");
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
       return;
     }
 
     setIsSubmitting(true);
     try {
+<<<<<<< HEAD
       const movieTitle = selectedItem.title || selectedItem.name || "Unknown";
       const posterPath = selectedItem.poster_path || null;
       const movieId   = selectedItem.id.toString();
@@ -99,6 +132,34 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
         { onConflict: "user_id,movie_id" }
       );
       if (historyError) console.warn("Watch history upsert:", historyError.message);
+=======
+      // 1. .NET API (non-blocking, may fail if user isn't registered there)
+      createReview({
+        movieId: selectedItem.id.toString(),
+        text: reviewText,
+        rating,
+      }).catch(e => console.warn("Optional .NET API review creation failed:", e));
+
+      // 2. Supabase user_reviews
+      await supabase.from("user_reviews").insert({
+        user_id: user.user_id,
+        movie_id: selectedItem.id.toString(),
+        review_text: reviewText || null,
+        rating,
+        platform_watched: platform || null,
+        is_public: isPublic,
+      });
+
+      // 3. Supabase user_watch_history
+      const firstGenre = selectedItem.genre_ids?.[0] || selectedItem.genres?.[0]?.id || null;
+      await supabase.from("user_watch_history").insert({
+        user_id: user.user_id,
+        movie_id: selectedItem.id.toString(),
+        movie_title: selectedItem.title || selectedItem.name,
+        genre: firstGenre?.toString() || null,
+        rating,
+      });
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
 
       toast.success("Review added to CinePool! ⭐");
       queryClient.invalidateQueries({ queryKey: ["feed"] });
@@ -139,7 +200,11 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
                 {(["movie", "series"] as const).map(t => (
                   <button
                     key={t}
+<<<<<<< HEAD
                     onClick={() => { setType(t); setSearchResults([]); setSearchQuery(""); }}
+=======
+                    onClick={() => setType(t)}
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
                     className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
                       type === t ? "gradient-gold text-primary-foreground" : "text-muted-foreground"
                     }`}
@@ -173,11 +238,19 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
                         <img
                           src={`https://image.tmdb.org/t/p/w92${item.poster_path}`}
                           alt={item.title || item.name}
+<<<<<<< HEAD
                           className="w-10 h-14 rounded object-cover flex-shrink-0"
                         />
                       ) : (
                         <div className="w-10 h-14 rounded bg-muted flex items-center justify-center text-[10px] text-center px-1 flex-shrink-0">
                           {(item.title || item.name)?.slice(0, 10)}
+=======
+                          className="w-12 h-18 rounded object-cover"
+                        />
+                      ) : (
+                        <div className="w-12 h-18 rounded bg-muted flex items-center justify-center text-[10px] text-center px-1">
+                          {item.title || item.name}
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
                         </div>
                       )}
                       <div className="flex-1 text-left">
@@ -199,6 +272,7 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
                   <img
                     src={`https://image.tmdb.org/t/p/w200${selectedItem.poster_path}`}
                     alt={selectedItem.title || selectedItem.name}
+<<<<<<< HEAD
                     className="w-16 h-24 rounded object-cover flex-shrink-0"
                   />
                 ) : (
@@ -207,16 +281,29 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
                   </div>
                 )}
                 <div className="flex-1">
+=======
+                    className="w-20 h-30 rounded object-cover"
+                  />
+                ) : (
+                  <div className="w-20 h-30 rounded bg-muted flex items-center justify-center text-xs text-center p-2">
+                    {selectedItem.title || selectedItem.name}
+                  </div>
+                )}
+                <div>
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
                   <h3 className="font-display font-bold">{selectedItem.title || selectedItem.name}</h3>
                   <p className="text-xs text-muted-foreground">
                     {selectedItem.release_date?.split("-")[0] || selectedItem.first_air_date?.split("-")[0] || "N/A"}
                   </p>
+<<<<<<< HEAD
                   <button
                     onClick={() => setSelectedItem(null)}
                     className="text-xs text-primary mt-1 hover:underline"
                   >
                     Change
                   </button>
+=======
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
                 </div>
               </div>
 
@@ -266,7 +353,11 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
                 />
               </div>
 
+<<<<<<< HEAD
               {/* Visibility Toggle */}
+=======
+              {/* Visibility */}
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
               <div className="flex items-center justify-between p-3 rounded-xl glass">
                 <div className="flex items-center gap-2">
                   {isPublic ? <Globe size={16} className="text-primary" /> : <Lock size={16} className="text-muted-foreground" />}
@@ -286,7 +377,11 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
                 disabled={rating === 0 || isSubmitting}
                 className="w-full py-3 rounded-xl gradient-gold text-primary-foreground font-display font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
               >
+<<<<<<< HEAD
                 {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : "Add to CinePool ⭐"}
+=======
+                {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : "Add to CinePool"}
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
               </button>
             </>
           )}

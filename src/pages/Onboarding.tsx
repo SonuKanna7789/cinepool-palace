@@ -10,11 +10,19 @@ import { searchTMDBMovies } from "@/services/tmdb";
 const GENRES = ["Action", "Drama", "Sci-Fi", "Comedy", "Horror", "Romance", "Documentary", "Thriller", "Animation", "Crime", "Fantasy", "Mystery"];
 const LANGUAGES = ["English", "Hindi", "Spanish", "French", "Korean", "Japanese", "Tamil", "Telugu", "Other"];
 const PLATFORMS = [
+<<<<<<< HEAD
   { id: "netflix",  name: "Netflix"    },
   { id: "prime",   name: "Prime Video" },
   { id: "disney",  name: "Disney+"     },
   { id: "hbo",     name: "HBO Max"     },
   { id: "apple",   name: "Apple TV+"   },
+=======
+  { id: "netflix", name: "Netflix" },
+  { id: "prime", name: "Prime Video" },
+  { id: "disney", name: "Disney+" },
+  { id: "hbo", name: "HBO Max" },
+  { id: "apple", name: "Apple TV+" },
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
 ];
 
 export default function Onboarding() {
@@ -22,6 +30,7 @@ export default function Onboarding() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+<<<<<<< HEAD
   const [genres,          setGenres         ] = useState<string[]>([]);
   const [language,        setLanguage       ] = useState<string>("");
   const [platforms,       setPlatforms      ] = useState<string[]>([]);
@@ -31,6 +40,20 @@ export default function Onboarding() {
   const [selectedMovies,  setSelectedMovies ] = useState<any[]>([]);
   const [favoriteMovieId, setFavoriteMovieId] = useState<string>("");
   const [isSubmitting,    setIsSubmitting   ] = useState(false);
+=======
+  // State
+  const [genres, setGenres] = useState<string[]>([]);
+  const [language, setLanguage] = useState<string>("");
+  const [platforms, setPlatforms] = useState<string[]>([]);
+  
+  // Movie Search State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedMovies, setSelectedMovies] = useState<any[]>([]);
+  const [favoriteMovieId, setFavoriteMovieId] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
 
   useEffect(() => {
     if (localStorage.getItem("cinepool_onboarded") === "true") {
@@ -41,7 +64,11 @@ export default function Onboarding() {
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (searchQuery.trim().length >= 2) {
+<<<<<<< HEAD
         doSearch(searchQuery);
+=======
+        searchMovies(searchQuery);
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
       } else {
         setSearchResults([]);
       }
@@ -49,7 +76,11 @@ export default function Onboarding() {
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery]);
 
+<<<<<<< HEAD
   const doSearch = async (query: string) => {
+=======
+  const searchMovies = async (query: string) => {
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
     setIsSearching(true);
     try {
       const results = await searchTMDBMovies(query);
@@ -61,6 +92,7 @@ export default function Onboarding() {
     }
   };
 
+<<<<<<< HEAD
   const toggleGenre    = (g: string) => setGenres(prev    => prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g]);
   const togglePlatform = (p: string) => setPlatforms(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
 
@@ -68,6 +100,25 @@ export default function Onboarding() {
     setSelectedMovies(prev => {
       if (prev.find(m => m.id === movie.id)) return prev.filter(m => m.id !== movie.id);
       if (prev.length >= 10) { toast.error("You can select up to 10 movies"); return prev; }
+=======
+  const toggleGenre = (g: string) => {
+    setGenres(prev => prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g]);
+  };
+
+  const togglePlatform = (p: string) => {
+    setPlatforms(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
+  };
+
+  const toggleMovie = (movie: any) => {
+    setSelectedMovies(prev => {
+      if (prev.find(m => m.id === movie.id)) {
+        return prev.filter(m => m.id !== movie.id);
+      }
+      if (prev.length >= 10) {
+        toast.error("You can select up to 10 movies");
+        return prev;
+      }
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
       return [...prev, movie];
     });
   };
@@ -85,11 +136,16 @@ export default function Onboarding() {
     if (!user) return;
     setIsSubmitting(true);
     try {
+<<<<<<< HEAD
       // 1. .NET API (non-blocking)
+=======
+      // 1. .NET API (non-blocking, may fail if user isn't registered there)
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
       updatePreferences({ favoriteGenres: genres, favoritePlatforms: platforms as any }).catch(e =>
         console.warn("Optional .NET API preferences update failed:", e)
       );
 
+<<<<<<< HEAD
       // 2. Supabase preferences — UPSERT so re-onboarding works
       const { error: prefError } = await supabase.from("user_preferences").upsert(
         {
@@ -124,6 +180,32 @@ export default function Onboarding() {
       localStorage.setItem("cinepool_onboarded", "true");
       toast.success("Welcome to CinePool! 🎬");
       navigate("/");
+=======
+      // 2. Supabase preferences
+      await supabase.from("user_preferences").insert({
+        user_id: user.user_id,
+        favorite_genres: genres,
+        favorite_platforms: platforms,
+        preferred_languages: [language]
+      });
+
+      // 3. Supabase watch history
+      const historyData = selectedMovies.map(m => ({
+        user_id: user.user_id,
+        movie_id: m.id.toString(),
+        movie_title: m.title,
+        genre: m.genre_ids?.[0]?.toString() || "Unknown",
+        rating: m.id.toString() === favoriteMovieId ? 5 : null,
+      }));
+      await supabase.from("user_watch_history").insert(historyData);
+
+      // Mark profile as onboarded
+      await supabase.from("profiles").update({ is_onboarded: true }).eq("user_id", user.user_id);
+
+      localStorage.setItem("cinepool_onboarded", "true");
+      navigate("/");
+      toast.success("Welcome to CinePool!");
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
     } catch (err: any) {
       toast.error(err.message || "Failed to complete onboarding");
     } finally {
@@ -220,6 +302,10 @@ export default function Onboarding() {
               <h1 className="font-display font-bold text-3xl mb-2">Pick some movies you've loved</h1>
               <p className="text-muted-foreground">Select 3 to 10 movies ({selectedMovies.length} selected).</p>
             </div>
+<<<<<<< HEAD
+=======
+            
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
               <input

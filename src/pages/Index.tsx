@@ -21,6 +21,10 @@ const Index = () => {
   useEffect(() => {
     if (isLoggedIn && !loading) {
       const onboarded = localStorage.getItem("cinepool_onboarded") === "true";
+<<<<<<< HEAD
+=======
+      // We could also check user?.is_onboarded if it was updated in real-time, but localStorage is faster
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
       if (!onboarded && !user?.is_onboarded) {
         navigate("/onboarding");
       } else if (user?.is_onboarded) {
@@ -48,8 +52,12 @@ const Index = () => {
     <div className="min-h-screen bg-background max-w-lg mx-auto relative">
       <ActiveComponent />
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+<<<<<<< HEAD
       {/* FIX: use user_id (Supabase auth UUID) not id (profiles PK) */}
       <ChatDrawer userId={user?.user_id ?? "anon"} />
+=======
+      <ChatDrawer userId={user?.id ?? "anon"} />
+>>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
     </div>
   );
 };
