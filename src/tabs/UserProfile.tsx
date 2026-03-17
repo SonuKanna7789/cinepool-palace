@@ -8,60 +8,28 @@ import { Settings, Film, MessageSquare, Clock, CreditCard, LogOut, Plus } from "
 type ProfileTab = "watched" | "reviews" | "pools";
 
 export function UserProfile() {
-<<<<<<< HEAD
-  const [tab,             setTab            ] = useState<ProfileTab>("watched");
-  const [reviewDialogOpen,setReviewDialogOpen] = useState(false);
-  const { logout, user } = useAuth();
-  const [watchHistory,    setWatchHistory   ] = useState<any[]>([]);
-  const [reviews,         setReviews        ] = useState<any[]>([]);
-=======
   const [tab, setTab] = useState<ProfileTab>("watched");
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const { logout, user } = useAuth();
   const [watchHistory, setWatchHistory] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
 
   const loadData = useCallback(async () => {
     if (!user) return;
     const [historyRes, reviewsRes] = await Promise.all([
-<<<<<<< HEAD
-      supabase
-        .from("user_watch_history")
-        .select("*")
-        .eq("user_id", user.user_id)
-        .order("watched_at", { ascending: false }),
-      supabase
-        .from("user_reviews")
-        .select("*")
-        .eq("user_id", user.user_id)
-        .order("created_at", { ascending: false }),
-=======
       supabase.from("user_watch_history").select("*").eq("user_id", user.user_id).order("watched_at", { ascending: false }),
       supabase.from("user_reviews").select("*").eq("user_id", user.user_id).order("created_at", { ascending: false }),
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
     ]);
     setWatchHistory(historyRes.data || []);
     setReviews(reviewsRes.data || []);
   }, [user]);
 
-<<<<<<< HEAD
   useEffect(() => { loadData(); }, [loadData]);
-
-  const userName    = user?.display_name || "User";
-  const initials    = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
-  const watchedCount = watchHistory.length;
-  const reviewCount  = reviews.length;
-=======
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
 
   const userName = user?.display_name || "User";
   const initials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
   const watchedCount = watchHistory.length;
   const reviewCount = reviews.length;
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
 
   return (
     <div className="pb-24">
@@ -92,10 +60,6 @@ export function UserProfile() {
 
       <AddReviewDialog open={reviewDialogOpen} onClose={() => { setReviewDialogOpen(false); loadData(); }} />
 
-<<<<<<< HEAD
-      {/* Avatar & Stats */}
-=======
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
       <div className="flex flex-col items-center pt-6 pb-4">
         <div className="h-20 w-20 rounded-full gradient-gold flex items-center justify-center text-2xl font-display font-bold text-primary-foreground">
           {initials}
@@ -121,20 +85,11 @@ export function UserProfile() {
         </div>
       </div>
 
-<<<<<<< HEAD
-      {/* Tabs */}
-      <div className="flex border-b border-border mx-4">
-        {([
-          { key: "watched"  as const, label: "Watched", icon: Film          },
-          { key: "reviews"  as const, label: "Reviews", icon: MessageSquare },
-          { key: "pools"    as const, label: "Pools",   icon: CreditCard    },
-=======
       <div className="flex border-b border-border mx-4">
         {([
           { key: "watched" as const, label: "Watched", icon: Film },
           { key: "reviews" as const, label: "Reviews", icon: MessageSquare },
           { key: "pools" as const, label: "Pools", icon: CreditCard },
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
         ]).map((t) => (
           <button
             key={t.key}
@@ -151,8 +106,6 @@ export function UserProfile() {
         ))}
       </div>
 
-<<<<<<< HEAD
-      {/* ── Watched Tab ── */}
       {tab === "watched" && (
         <div className="grid grid-cols-3 gap-2 p-4">
           {watchHistory.length === 0 ? (
@@ -161,37 +114,10 @@ export function UserProfile() {
             </p>
           ) : watchHistory.map((movie: any) => (
             <div key={movie.id} className="relative rounded-xl overflow-hidden animate-fade-in bg-secondary">
-              <div className="w-full aspect-[2/3]">
-                {/* FIX: show TMDB poster if available */}
-                {movie.poster_path ? (
-                  <img
-                    src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                    alt={movie.movie_title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center p-2">
-                    <p className="text-[10px] font-medium text-center text-muted-foreground leading-tight">
-                      {movie.movie_title}
-                    </p>
-                  </div>
-                )}
-              </div>
-              {/* Rating overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-background/90 to-transparent">
-=======
-      {tab === "watched" && (
-        <div className="grid grid-cols-3 gap-2 p-4">
-          {watchHistory.length === 0 ? (
-            <p className="col-span-3 text-center text-sm text-muted-foreground py-8">No movies watched yet. Add your first review!</p>
-          ) : watchHistory.map((movie: any) => (
-            <div key={movie.id} className="relative rounded-xl overflow-hidden animate-fade-in bg-secondary">
               <div className="w-full aspect-[2/3] flex items-center justify-center p-2">
                 <p className="text-[10px] font-medium text-center">{movie.movie_title}</p>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-background/80 to-transparent">
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
+              <div className="absolute bottom-0 left-0 right-0 p-1.5 bg-gradient-to-t from-background/90 to-transparent">
                 <StarRating rating={movie.rating || 0} size={10} />
               </div>
             </div>
@@ -199,31 +125,16 @@ export function UserProfile() {
         </div>
       )}
 
-<<<<<<< HEAD
-      {/* ── Reviews Tab ── */}
-=======
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
       {tab === "reviews" && (
         <div className="p-4 space-y-3">
           {reviews.length === 0 ? (
             <p className="text-center text-sm text-muted-foreground py-8">No reviews yet.</p>
           ) : reviews.map((review: any) => (
-<<<<<<< HEAD
             <div key={review.id} className="glass rounded-xl p-3 animate-fade-in flex gap-3">
-              {/* FIX: show poster thumbnail if available */}
-              {review.poster_path ? (
-                <img
-                  src={`https://image.tmdb.org/t/p/w92${review.poster_path}`}
-                  alt={review.movie_title}
-                  className="w-10 h-14 rounded object-cover flex-shrink-0"
-                />
-              ) : (
-                <div className="w-10 h-14 rounded bg-muted flex items-center justify-center text-[9px] text-center p-1 flex-shrink-0">
-                  <Film size={14} className="text-muted-foreground" />
-                </div>
-              )}
+              <div className="w-10 h-14 rounded bg-muted flex items-center justify-center text-[9px] text-center p-1 flex-shrink-0">
+                <Film size={14} className="text-muted-foreground" />
+              </div>
               <div className="flex-1 min-w-0">
-                {/* FIX: show movie_title not movie_id */}
                 <p className="text-sm font-semibold truncate">
                   {review.movie_title || `Movie #${review.movie_id}`}
                 </p>
@@ -237,27 +148,11 @@ export function UserProfile() {
                   </p>
                 )}
               </div>
-=======
-            <div key={review.id} className="glass rounded-xl p-3 animate-fade-in">
-              <div className="flex items-center gap-2">
-                <div>
-                  <p className="text-sm font-medium">Movie #{review.movie_id}</p>
-                  <StarRating rating={review.rating} size={10} />
-                </div>
-              </div>
-              {review.review_text && (
-                <p className="text-xs text-muted-foreground mt-2">{review.review_text}</p>
-              )}
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
             </div>
           ))}
         </div>
       )}
 
-<<<<<<< HEAD
-      {/* ── Pools Tab ── */}
-=======
->>>>>>> 822687860278937d328a1f80127f1d63ad2e187b
       {tab === "pools" && (
         <div className="p-4 space-y-3">
           <div className="glass rounded-xl p-4 animate-fade-in">
