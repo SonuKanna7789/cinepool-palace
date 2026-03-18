@@ -73,7 +73,18 @@ export function AddReviewDialog({ open, onClose }: ReviewDialogProps) {
         console.warn("Optional .NET API review failed:", e)
       );
 
-      // 2. Supabase user_reviews
+      // 2. Upsert movie into movies table (required for foreign key)
+      await supabase.from("movies").upsert({
+        id: movieId,
+        title: movieTitle,
+        poster_path: posterPath,
+        genre_ids: selectedItem.genre_ids || [],
+        overview: selectedItem.overview || null,
+        release_date: selectedItem.release_date || selectedItem.first_air_date || null,
+        vote_average: selectedItem.vote_average || null,
+      }, { onConflict: "id" });
+
+      // 3. Supabase user_reviews
       const { error: reviewError } = await supabase.from("user_reviews").insert({
         user_id: user.user_id,
         movie_id: movieId,
