@@ -55,36 +55,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Timeout fallback in case getSession hangs
-    const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 5000);
+    let mounted = true;
 
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      clearTimeout(timeout);
-      if (session?.user) {
-        loadUserProfile(session.user);
+    // 1. Restore session from storage first
+    const initSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!mounted) return;
+        if (session?.user) {
+          await loadUserProfile(session.user);
+        }
+      } catch (err) {
+        console.error('Failed to restore session:', err);
+      } finally {
+        if (mounted) setLoading(false);
       }
-      setLoading(false);
-    }).catch(() => {
-      clearTimeout(timeout);
-      setLoading(false);
-    });
+    };
 
-    // Listen for auth changes
+    initSession();
+
+    // 2. Listen for future auth changes (fire-and-forget, no await)
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        await loadUserProfile(session.user);
+        loadUserProfile(session.user);
       } else {
         setUser(null);
       }
-      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [loadUserProfile]);
 
   const signUp = useCallback(async (email: string, password: string, name: string) => {
