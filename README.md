@@ -1,73 +1,153 @@
-# Welcome to your Lovable project
+# 🎬 CinePool Palace
 
-## Project info
+**The social network for cinephiles.** Share the films worth watching, build a taste profile people follow you for, form crews that watch movies together at the cinema — and when your city's screens are missing a classic, campaign to bring it back.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Built with **Expo (React Native + TypeScript)** on the frontend and **Supabase** as the entire backend — auth, Postgres, row-level security, realtime chat and edge functions, all on the free tier. There is no server to maintain or pay for.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## ✨ What it does
 
-**Use Lovable**
+| | Feature | How it works |
+|---|---|---|
+| ⭐ | **Rate & review** | Log any film (search powered by TMDB), rate it 1–5 stars, say where you watched it. Every review is a post in the social feed. |
+| 👤 | **Taste profiles** | Your ratings build a public profile: review count, average score, top genres. People follow you *for your taste*. |
+| 📰 | **Feed** | A poster-led feed of reviews — switch between *Everyone* and *Following*. |
+| 👥 | **Crews** | Create or join movie groups. Each crew has realtime chat and shared plans. |
+| 🍿 | **Watch parties** | A crew picks a film, a cinema and a time. Members RSVP, watch together, then argue about it in chat. |
+| 🎟️ | **Screening campaigns** | Want *Interstellar* back in IMAX? Open a request for a cinema in your city, gather 🔥 votes, and take the demand to the cinema. |
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## 📱 App screens
 
-Changes made via Lovable will be committed automatically to this repo.
+| Feed | Discover | Crews |
+|---|---|---|
+| ![Feed](docs/screens/01-feed.svg) | ![Discover](docs/screens/02-discover.svg) | ![Crews](docs/screens/03-crews.svg) |
 
-**Use your preferred IDE**
+| Crew & watch party | Screenings | Taste profile |
+|---|---|---|
+| ![Crew detail](docs/screens/04-crew-detail.svg) | ![Screenings](docs/screens/05-screenings.svg) | ![Profile](docs/screens/06-profile.svg) |
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🏗 Architecture
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+┌─────────────────────────────────────────────┐
+│   Expo app (React Native + TypeScript)      │
+│   expo-router · expo-image · realtime UI    │
+└──────────────────┬──────────────────────────┘
+                   │  @supabase/supabase-js
+┌──────────────────▼──────────────────────────┐
+│                Supabase (free tier)         │
+│  Auth          email/password sessions      │
+│  Postgres      profiles · reviews · follows │
+│                crews · parties · screenings │
+│  RLS           every table policy-guarded   │
+│  Realtime      crew chat subscriptions      │
+│  Edge function tmdb-proxy (keeps TMDB key   │
+│                server-side)                 │
+└──────────────────┬──────────────────────────┘
+                   │
+            ┌──────▼──────┐
+            │  TMDB API   │  movie data & posters
+            └─────────────┘
 ```
 
-**Edit a file directly in GitHub**
+**Repo layout**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
+app/                  # screens (expo-router file-based routing)
+  (auth)/             # sign-in, sign-up
+  (tabs)/             # feed, discover, crews, screenings, profile
+  movie/[id]          # movie detail
+  crew/[id]           # crew detail: watch parties + realtime chat
+  review/[movieId]    # log & review modal
+  party/new           # plan a watch party
+  screening/new       # start a screening campaign
+src/
+  api/                # all Supabase queries (profiles, reviews, crews, screenings)
+  components/         # design system + feature cards
+  lib/                # supabase client, TMDB client (via edge proxy)
+  providers/          # auth/session context
+  theme/              # colors, spacing, typography
+supabase/
+  migrations/         # full SQL schema + RLS policies
+  functions/          # edge functions (tmdb-proxy, movie-chat, suggestions)
+docs/screens/         # the screen mockups above
+```
 
-**Use GitHub Codespaces**
+## 🚀 Getting started
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 1. Clone & install
 
-## What technologies are used for this project?
+```sh
+git clone https://github.com/SonuKanna7789/cinepool-palace.git
+cd cinepool-palace
+npm install
+```
 
-This project is built with:
+### 2. Set up Supabase (free)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. Create a project at [supabase.com](https://supabase.com) (free tier is plenty).
+2. Copy `.env.example` to `.env` and fill in your project URL and anon key (Project Settings → API).
+3. Apply the schema — either paste the contents of
+   [`supabase/migrations/20260611090000_social_layer.sql`](supabase/migrations/20260611090000_social_layer.sql)
+   into the **SQL Editor** and run it, or use the CLI:
 
-## How can I deploy this project?
+   ```sh
+   npx supabase login
+   npx supabase link --project-ref <your-project-ref>
+   npx supabase db push
+   ```
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+   > ⚠️ **If you're using the existing project in `.env`:** the social-layer migration still needs
+   > to be applied once via the SQL Editor before crews, parties and screenings work.
 
-## Can I connect a custom domain to my Lovable project?
+4. (For movie search) get a free [TMDB API key](https://www.themoviedb.org/settings/api), then deploy the proxy and set the secret:
 
-Yes, you can!
+   ```sh
+   npx supabase functions deploy tmdb-proxy
+   npx supabase secrets set TMDB_API_KEY=<your-tmdb-key>
+   ```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### 3. Run the app
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```sh
+npx expo start
+```
+
+Scan the QR code with **Expo Go** ([iOS](https://apps.apple.com/app/expo-go/id982107779) / [Android](https://play.google.com/store/apps/details?id=host.exp.exponent)) — or press `i` / `a` for a simulator, `w` for the browser.
+
+## 💸 Hosting — free, nothing to deploy
+
+The "backend" is Supabase itself, so there is no server of your own:
+
+- **Database, auth, realtime, storage** — Supabase free tier (500 MB DB, 50k monthly active users).
+- **Edge functions** — deployed to Supabase with one CLI command, 500k invocations/month free.
+- **Movie data** — TMDB API, free for non-commercial use.
+- **App distribution** — [EAS Build](https://docs.expo.dev/build/introduction/) free tier produces installable iOS/Android builds; or ship instantly via Expo Go during development.
+
+## 🔒 Security model
+
+Every table is protected by Postgres **row-level security**:
+
+- Profiles and public reviews are readable by all signed-in users (it's a social network).
+- You can only write rows as yourself (`auth.uid()` checks on every insert/update/delete).
+- Crew chat is readable and writable by crew members only.
+- The TMDB API key never ships in the app — requests go through the `tmdb-proxy` edge function.
+
+## 🧰 Tech stack
+
+- [Expo SDK 56](https://expo.dev) / React Native 0.85 / React 19 / TypeScript (strict)
+- [expo-router](https://docs.expo.dev/router/introduction/) — file-based navigation, typed routes
+- [Supabase](https://supabase.com) — Postgres, Auth, RLS, Realtime, Edge Functions
+- [TMDB](https://www.themoviedb.org) — movie metadata & posters
+
+## 🗺 Roadmap ideas
+
+- Push notifications for party RSVPs and new followers (expo-notifications)
+- AI-powered "what should we watch?" picker for crews (the `movie-chat` edge function is already in the repo)
+- Cinema-side dashboard so theatres can browse and accept screening campaigns
+- Letterboxd import
+
+---
+
+Made with 🍿 for people who stay through the credits.
