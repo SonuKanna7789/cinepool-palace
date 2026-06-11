@@ -88,18 +88,18 @@ npm install
 
 1. Create a project at [supabase.com](https://supabase.com) (free tier is plenty).
 2. Copy `.env.example` to `.env` and fill in your project URL and anon key (Project Settings → API).
-3. Apply the schema — either paste the contents of
-   [`supabase/migrations/20260611090000_social_layer.sql`](supabase/migrations/20260611090000_social_layer.sql)
-   into the **SQL Editor** and run it, or use the CLI:
+3. Apply the schema — in the **SQL Editor**, run these two files **in order**:
+
+   1. [`supabase/migrations/20260611080000_base_schema.sql`](supabase/migrations/20260611080000_base_schema.sql) — profiles, movies, reviews, preferences + auto-profile trigger
+   2. [`supabase/migrations/20260611090000_social_layer.sql`](supabase/migrations/20260611090000_social_layer.sql) — follows, crews, chat, watch parties, screening campaigns
+
+   Both are idempotent (safe to re-run). Or apply them with the CLI:
 
    ```sh
    npx supabase login
    npx supabase link --project-ref <your-project-ref>
    npx supabase db push
    ```
-
-   > ⚠️ **If you're using the existing project in `.env`:** the social-layer migration still needs
-   > to be applied once via the SQL Editor before crews, parties and screenings work.
 
 4. (For movie search) get a free [TMDB API key](https://www.themoviedb.org/settings/api), then deploy the proxy and set the secret:
 
