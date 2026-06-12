@@ -15,7 +15,7 @@ serve(async (req) => {
 
   try {
     const { endpoint, params } = await req.json();
-    
+
     if (!TMDB_API_KEY) {
       return new Response(JSON.stringify({ error: "TMDB API key not configured" }), {
         status: 500,
@@ -25,7 +25,7 @@ serve(async (req) => {
 
     const searchParams = new URLSearchParams({ api_key: TMDB_API_KEY, ...params });
     const url = `${TMDB_BASE_URL}${endpoint}?${searchParams}`;
-    
+
     const res = await fetch(url);
     const data = await res.json();
 
